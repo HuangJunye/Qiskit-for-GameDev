@@ -1,4 +1,4 @@
-# Qiskit forGameDev
+# Qiskit for GameDev
 This is a repo to put useful tools for making games using [Qiskit](https://github.com/Qiskit/qiskit), IBM's open source framework for making software for quantum comptuers. Codes used here were derived from works of James Weaver, Huang Junye and Asier Arranz.
 
 ## Game engines
