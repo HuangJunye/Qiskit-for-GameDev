@@ -26,8 +26,8 @@ end
 
 LOG_DEBUG = false
 
-local qiskit_service_host = minetest.settings:get("qiskit_service_host") or
-        "https://qiskit-blocks-service.herokuapp.com"
+local qiskit_service_host = minetest.settings:get("qiskit_service_host") or --localhost address can be changed in minetest.conf
+        "https://qiskit-blocks-service.herokuapp.com"  -- paste here you own qiskit flask server address
 
 local qiskit_service_timeout = tonumber(minetest.settings:get("qiskit_service_timeout")) or 10
 
@@ -3621,7 +3621,3 @@ minetest.register_globalstep(function(dtime)
         end
     end
 end)
-
-
-
-
