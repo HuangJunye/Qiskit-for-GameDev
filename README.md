@@ -24,7 +24,7 @@ Tutorials on how to use the tools here will be added soon. Please check examples
 [QPong](https://github.com/HuangJunye/QPong): Quantum version of the class Pong game.
 
 ### Unity
-[QPong-Unity](https://github.com/HuangJunye/QPong-Unity):
+[QPong-Unity](https://github.com/HuangJunye/QPong-Unity): QPong rewritten in Unity, custom built for IBM Quantum Arcade machine.
 
 ### Minetest
 [QiskitBlocks](https://github.com/JavaFXpert/QiskitBlocks): Game that teaches quantum computing using Qiskit in a Minetest block world.
