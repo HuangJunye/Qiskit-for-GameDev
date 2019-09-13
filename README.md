@@ -1,5 +1,5 @@
 # Qiskit for GameDev
-This is a repo to put useful tools for making games using [Qiskit](https://github.com/Qiskit/qiskit), IBM's open source framework for making software for quantum comptuers. Codes used here were derived from works of James Weaver, Huang Junye and Asier Arranz.
+This is a repo to put useful tools for making games using [Qiskit](https://github.com/Qiskit/qiskit), IBM's open source framework for making software for quantum comptuers. Codes used here were derived from works of [James Weaver](https://github.com/JavaFXpert), [Huang Junye](https://github.com/HuangJunye) and [Asier Arranz](https://github.com/asierarranz).
 
 ## Game engines
 ### Currently supported game engines
@@ -28,3 +28,8 @@ Tutorials on how to use the tools here will be added soon. Please check examples
 
 ### Minetest
 [QiskitBlocks](https://github.com/JavaFXpert/QiskitBlocks): Game that teaches quantum computing using Qiskit in a Minetest block world.
+
+
+## Other useful repo for making games with Qiskit
+Making games in [PewPew](https://pewpew.readthedocs.io/en/latest/pewpew10/overview.html) with Pygame and Qiskit: https://github.com/quantumjim/pewpew_qiskit_workshops
+ 
