@@ -8,6 +8,14 @@ from model.circuit_grid_model import CircuitGridModel, CircuitGridNode
 from model import circuit_node_types as node_types
 
 
+def qasm(qasm, backend_to_run='qasm_simulator'):
+    circuit = QuantumCircuit.from_qasm_str(qasm)
+    backend = BasicAer.get_backend(backend_to_run)
+    job_sim = execute(circuit, backend, shots=1)
+    result_sim = job_sim.result()
+    return result_sim.get_counts(circuit)
+
+
 def statevector(circuit_dimension, gate_string):
     circuit = circuit_from_string(circuit_dimension, gate_string)
     shot_num = 1000
