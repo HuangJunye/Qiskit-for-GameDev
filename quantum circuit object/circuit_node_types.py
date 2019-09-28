@@ -14,20 +14,48 @@
 # limitations under the License.
 #
 EMPTY = 'e'
-CTRL = 'ct'  # "control" part of multi-qubit gate
-TRACE = 'tr'  # In the path between a gate part and a "control" or "swap" part
-IDEN = 'id'
-X = 'x'
-Y = 'y'
-Z = 'z'
-H = 'h'
-S = 's'
-SDG = 'sdg'
-T = 't'
-TDG = 'tdg'
+
+ID = 'id'  # identity gate
+
+X = 'x'  # Pauli gate: bit-flip
+Y = 'y'  # Pauli gate: bit and phase flip
+Z = 'z'  # Pauli gate: phase flip
+
+H = 'h'  # Clifford gate: Hadamard gate
+S = 's'  # Clifford gate: sqrt(Z) phase gate
+SDG = 'sdg'  # Clifford gate: conjugate of sqrt(Z)
+T = 't'  # C3 gate: sqrt(S) phase gate
+TDG = 'tdg'  # C3 gate: conjugate of sqrt(S)
+
+U1 = 'u1'
+U2 = 'u2'
+U3 = 'u3'
+
+RX = 'rx'
+RY = 'ry'
+RZ = 'rz'
+
+CX = 'cx'
+CY = 'cy'
+CZ = 'cz'
+CH = 'ch'
+
+CRZ = 'crz'
+
+CU1 = 'cu1'
+CU3 = 'cu3'
+
+CCX = 'ccx'
+
 SWAP = 'swap'
+
 BARRIER = 'barrier'
 MEASURE_Z = 'measure'
+RESET = 'reset'
+IF = 'if'
+
+CTRL = 'ct'  # "control" part of multi-qubit gate
+TRACE = 'tr'  # In the path between a gate part and a "control" or "swap" part
 
 normal_nodes = [
     IDEN,
