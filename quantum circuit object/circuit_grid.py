@@ -77,7 +77,7 @@ class CircuitGridModel:
     def create_qasm_for_node(self, circuit_grid_node, qubit_index):
         qasm_str = ""
         node_type = circuit_grid_node.node_type
-        if node_type == node_types.IDEN:
+        if node_type in node_types.normal_nodes:
             # identity gate
             qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
         elif node_type == node_types.X or \

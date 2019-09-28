@@ -29,3 +29,23 @@ SWAP = 'swap'
 BARRIER = 'barrier'
 MEASURE_Z = 'measure'
 
+normal_nodes = [
+    IDEN,
+    S,
+    SDG,
+    T,
+    TDG
+]
+
+controllable_nodes = [
+    H,
+    X,
+    Y,
+    Z
+]
+
+rotatable_nodes = [
+    X,
+    Y,
+    Z
+]
