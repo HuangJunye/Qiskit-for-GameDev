@@ -18,12 +18,12 @@ class CircuitGridModel:
                 self.set_node(qubit_index, depth_index, CircuitGridNode(node_types.EMPTY))
 
     def __str__(self):
-        retval = ''
+        gate_array_string = ''
         for qubit_index in range(self.qubit_count):
-            retval += '\n'
+            gate_array_string += '\n'
             for depth_index in range(self.circuit_depth):
-                retval += str(self.get_node_type(qubit_index, depth_index)) + ', '
-        return 'CircuitGridModel: ' + retval
+                gate_array_string += str(self.get_node_type(qubit_index, depth_index)) + ', '
+        return 'CircuitGridModel: ' + gate_array_string
 
     def set_node(self, qubit_index, depth_index, circuit_grid_node):
         self.circuit_grid[qubit_index][depth_index] = \
