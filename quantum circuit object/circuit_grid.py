@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 import circuit_node_types as node_types
 
@@ -16,6 +17,8 @@ class CircuitGridModel:
         for depth_index in range(self.circuit_depth):
             for qubit_index in range(self.qubit_count):
                 self.set_node(qubit_index, depth_index, CircuitGridNode(node_types.EMPTY))
+
+        self.threshold = 0.0001
 
     def __str__(self):
         gate_array_string = ''
@@ -74,9 +77,27 @@ class CircuitGridModel:
     def qasm_for_normal_node(self, node_type, qubit_index):
         return node_type + ' q[' + str(qubit_index) + '];'
 
+    def qasm_for_controllable_node(self, circuit_grid_node, qubit_index):
+        qasm_str = ''
+        node_type = circuit_grid_node.node_type
+        ctrl_a = circuit_grid_node.ctrl_a
+
+        if ctrl_a == -1:
+            # normal gate
+            qasm_str += f'{node_type} q[{qubit_index}];'
+        else:
+            # controlled gate
+            qasm_str += f'c{node_type} q[{ctrl_a}], q[{qubit_index}];'
+        return qasm_str
+
     def create_qasm_for_node(self, circuit_grid_node, qubit_index):
         qasm_str = ""
         node_type = circuit_grid_node.node_type
+        radians = circuit_grid_node.radians
+        ctrl_a = circuit_grid_node.ctrl_a
+        ctrl_b = circuit_grid_node.ctrl_b
+        swap = circuit_grid_node.swap
+
         if node_type in node_types.normal_nodes:
             # identity gate
             qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
@@ -84,7 +105,12 @@ class CircuitGridModel:
                 node_type == node_types.Y or \
                 node_type == node_types.Z:
             # X, Y, Z gate
-            qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
+            if abs(radians - math.pi) <= self.threshold:
+                qasm_str += self.qasm_for_controllable_node(circuit_grid_node, qubit_index)
+            else:
+                # Rotation around Y axis
+                qasm_str += 'ry(' + str(radians) + ') '
+                qasm_str += 'q[' + str(qubit_index) + '];'
         elif node_type == node_types.H:
             # Hadamard gate
             qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
