@@ -88,7 +88,6 @@ class CircuitGridModel:
         elif node_type == node_types.H:
             # Hadamard gate
             qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
-
         return qasm_str
 
     def create_qasm_for_circuit(self):
@@ -105,6 +104,9 @@ class CircuitGridModel:
             for qubit_index in range(self.qubit_count):
                 qasm_str = qasm_str + self.create_qasm_for_node(self.circuit_grid[qubit_index][depth_index], qubit_index)
         return qasm_str
+
+    def reset_circuit(self):
+        self.circuit_grid = np.empty((qubit_count, circuit_depth), dtype=CircuitGridNode)
 
 
 class CircuitGridNode:
