@@ -3,7 +3,7 @@ import numpy as np
 import circuit_node_types
 
 
-class CircuitGrid:
+class CircuitGridModel:
     """
     Grid-based model that is built when user interacts with circuit
     """
@@ -17,6 +17,13 @@ class CircuitGrid:
             for qubit_index in range(self.qubit_count):
                 self.set_node(qubit_index, depth_index, CircuitGridNode(circuit_node_types.EMPTY))
 
+    def __str__(self):
+        retval = ''
+        for qubit_index in range(self.qubit_count):
+            retval += '\n'
+            for depth_index in range(self.circuit_depth):
+                retval += str(self.get_node_gate_part(qubit_index, depth_index)) + ', '
+        return 'CircuitGridModel: ' + retval
 
     def set_node(self, qubit_index, depth_index, circuit_grid_node):
         self.circuit_grid[qubit_index][depth_index] = \
@@ -28,6 +35,41 @@ class CircuitGrid:
 
     def get_node(self, qubit_index, depth_index):
         return self.circuit_grid[qubit_index][depth_index]
+
+    def get_node_gate_part(self, qubit_index, depth_index):
+        requested_node = self.circuit_grid[qubit_index][depth_index]
+        if requested_node and requested_node.node_type != circuit_node_types.EMPTY:
+            # Node is occupied so return its gate
+            return requested_node.node_type
+        else:
+            # Check for control nodes from gates in other nodes in this column
+            nodes_in_column = self.circuit_grid[:, depth_index]
+            for idx in range(self.qubit_count):
+                if idx != qubit_index:
+                    other_node = nodes_in_column[idx]
+                    if other_node:
+                        if other_node.ctrl_a == qubit_index or other_node.ctrl_b == qubit_index:
+                            return circuit_node_types.CTRL
+                        elif other_node.swap == qubit_index:
+                            return circuit_node_types.SWAP
+
+        return circuit_node_types.EMPTY
+
+    def get_gate_qubit_for_control_node(self, control_qubit_index, depth_index):
+        """Get qubit index for gate that belongs to a control node on the given qubit"""
+        gate_qubit_index = -1
+        nodes_in_column = self.circuit_grid[:, depth_index]
+        for qubit_index in range(self.qubit_count):
+            if qubit_index != control_qubit_index:
+                other_node = nodes_in_column[qubit_index]
+                if other_node:
+                    if other_node.ctrl_a == control_qubit_index or \
+                            other_node.ctrl_b == control_qubit_index:
+                        gate_qubit_index = qubit_index
+                        print("Found gate: ",
+                              self.get_node_gate_part(gate_qubit_index, depth_index),
+                              " on wire: ", gate_qubit_index)
+        return gate_qubit_index
 
     def create_qasm_for_node(self, circuit_grid_node, qubit_index):
         qasm_str = ""
