@@ -26,7 +26,7 @@ class CircuitGridModel:
             gate_array_string += '\n'
             for depth_index in range(self.circuit_depth):
                 gate_array_string += str(self.get_node_type(qubit_index, depth_index)) + ', '
-        return 'CircuitGridModel: ' + gate_array_string
+        return f'CircuitGridModel: {gate_array_string}'
 
     def set_node(self, qubit_index, depth_index, circuit_grid_node):
         self.circuit_grid[qubit_index][depth_index] = \
@@ -69,13 +69,13 @@ class CircuitGridModel:
                     if other_node.ctrl_a == control_qubit_index or \
                             other_node.ctrl_b == control_qubit_index:
                         gate_qubit_index = qubit_index
-                        print("Found gate: ",
-                              self.get_node_type(gate_qubit_index, depth_index),
-                              " on wire: ", gate_qubit_index)
+                        print(f'Found gate: {self.get_node_type(gate_qubit_index, depth_index)} '
+                              f'on wire: {gate_qubit_index}')
         return gate_qubit_index
 
     def qasm_for_normal_node(self, node_type, qubit_index):
-        return node_type + ' q[' + str(qubit_index) + '];'
+        return f'{node_type} q[{qubit_index}];'
+
 
     def qasm_for_controllable_node(self, circuit_grid_node, qubit_index):
         node_type = circuit_grid_node.node_type
@@ -114,31 +114,24 @@ class CircuitGridModel:
             if abs(radians - math.pi) <= self.threshold:
                 qasm_str += self.qasm_for_controllable_node(circuit_grid_node, qubit_index)
             else:
-                # Rotation around Y axis
-                qasm_str += 'ry(' + str(radians) + ') '
-                qasm_str += 'q[' + str(qubit_index) + '];'
+                qasm_str += self.qasm_for_rotatable_node(circuit_grid_node, qubit_index)
         elif node_type == node_types.H:
             # Hadamard gate
             qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
         return qasm_str
 
     def create_qasm_for_circuit(self):
-        # include header
-        qasm_str = 'OPENQASM 2.0;include "qelib1.inc";'
-
-        # define quantum registers
-        qasm_str = qasm_str + 'qreg q[' + str(self.qubit_count) + '];'
-
-        # add a column of identity gates to protect simulators from an empty circuit
-        qasm_str = qasm_str+'id q;'
+        qasm_str = 'OPENQASM 2.0;include "qelib1.inc";'  # include header
+        qasm_str += f'qreg q[{self.qubit_count}];'  # define quantum registers
+        qasm_str += 'id q;'  # add a column of identity gates to protect simulators from an empty circuit
 
         for depth_index in range(self.circuit_depth):
             for qubit_index in range(self.qubit_count):
-                qasm_str = qasm_str + self.create_qasm_for_node(self.circuit_grid[qubit_index][depth_index], qubit_index)
+                qasm_str += self.create_qasm_for_node(self.circuit_grid[qubit_index][depth_index], qubit_index)
         return qasm_str
 
     def reset_circuit(self):
-        self.circuit_grid = np.empty((qubit_count, circuit_depth), dtype=CircuitGridNode)
+        self.circuit_grid = np.empty((self.qubit_count, self.circuit_depth), dtype=CircuitGridNode)
 
 
 class CircuitGridNode:
@@ -155,8 +148,8 @@ class CircuitGridNode:
         self.swap = swap
 
     def __str__(self):
-        string = 'type: ' + str(self.node_type)
-        string += ', radians: ' + str(self.radians) if self.radians != 0 else ''
-        string += ', ctrl_a: ' + str(self.ctrl_a) if self.ctrl_a != -1 else ''
-        string += ', ctrl_b: ' + str(self.ctrl_b) if self.ctrl_b != -1 else ''
+        string = f'type: {self.node_type}'
+        string += f', radians: {self.radians}' if self.radians != 0 else ''
+        string += f', ctrl_a: {self.ctrl_a}' if self.ctrl_a != -1 else ''
+        string += f', ctrl_b: {self.ctrl_b}' if self.ctrl_b != -1 else ''
         return string
