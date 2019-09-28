@@ -76,15 +76,15 @@ class CircuitGridModel:
         node_type = circuit_grid_node.node_type
         if node_type == circuit_node_types.IDEN:
             # identity gate
-            qasm_str = qasm_str + 'id q[' + str(qubit_index) + '];'
+            qasm_str += node_type + ' q[' + str(qubit_index) + '];'
         elif node_type == circuit_node_types.X or \
                 node_type == circuit_node_types.Y or \
                 node_type == circuit_node_types.Z:
             # X, Y, Z gate
-            qasm_str = qasm_str + node_type + ' q[' + str(qubit_index) + '];'
+            qasm_str += node_type + ' q[' + str(qubit_index) + '];'
         elif node_type == circuit_node_types.H:
             # Hadamard gate
-            qasm_str = qasm_str + node_type + ' q[' + str(qubit_index) + '];'
+            qasm_str += node_type + ' q[' + str(qubit_index) + '];'
 
         return qasm_str
 

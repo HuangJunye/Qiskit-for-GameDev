@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-EMPTY = 1
-CTRL = 2  # "control" part of multi-qubit gate
-TRACE = 3  # In the path between a gate part and a "control" or "swap" part
+EMPTY = 'e'
+CTRL = 'ct'  # "control" part of multi-qubit gate
+TRACE = 'tr'  # In the path between a gate part and a "control" or "swap" part
 IDEN = 'id'
 X = 'x'
 Y = 'y'
