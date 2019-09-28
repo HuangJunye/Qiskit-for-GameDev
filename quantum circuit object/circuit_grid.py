@@ -25,7 +25,7 @@ class CircuitGridModel:
         for qubit_index in range(self.qubit_count):
             gate_array_string += '\n'
             for depth_index in range(self.circuit_depth):
-                gate_array_string += str(self.get_node_type(qubit_index, depth_index)) + ', '
+                gate_array_string += f'{self.get_node_type(qubit_index, depth_index)}, '
         return f'CircuitGridModel: {gate_array_string}'
 
     def set_node(self, qubit_index, depth_index, circuit_grid_node):
@@ -70,12 +70,11 @@ class CircuitGridModel:
                             other_node.ctrl_b == control_qubit_index:
                         gate_qubit_index = qubit_index
                         print(f'Found gate: {self.get_node_type(gate_qubit_index, depth_index)} '
-                              f'on wire: {gate_qubit_index}')
+                              f'on qubit: {gate_qubit_index}')
         return gate_qubit_index
 
     def qasm_for_normal_node(self, node_type, qubit_index):
         return f'{node_type} q[{qubit_index}];'
-
 
     def qasm_for_controllable_node(self, circuit_grid_node, qubit_index):
         node_type = circuit_grid_node.node_type
