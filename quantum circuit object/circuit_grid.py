@@ -78,16 +78,22 @@ class CircuitGridModel:
         return node_type + ' q[' + str(qubit_index) + '];'
 
     def qasm_for_controllable_node(self, circuit_grid_node, qubit_index):
-        qasm_str = ''
         node_type = circuit_grid_node.node_type
         ctrl_a = circuit_grid_node.ctrl_a
 
         if ctrl_a == -1:
             # normal gate
-            qasm_str += f'{node_type} q[{qubit_index}];'
+            qasm_str = f'{node_type} q[{qubit_index}];'
         else:
             # controlled gate
-            qasm_str += f'c{node_type} q[{ctrl_a}], q[{qubit_index}];'
+            qasm_str = f'c{node_type} q[{ctrl_a}], q[{qubit_index}];'
+        return qasm_str
+
+    def qasm_for_rotatable_node(self, circuit_grid_node, qubit_index):
+        node_type = circuit_grid_node.node_type
+        radians = circuit_grid_node.radians
+
+        qasm_str = f'r{node_type}({radians}) q[{qubit_index}];'
         return qasm_str
 
     def create_qasm_for_node(self, circuit_grid_node, qubit_index):
