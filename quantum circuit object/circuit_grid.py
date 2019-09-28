@@ -139,7 +139,7 @@ class CircuitGridNode:
     A node is usually a gate.
     """
 
-    def __init__(self, node_type, radians=0.0, ctrl_a=-1, ctrl_b=-1, swap=-1):
+    def __init__(self, node_type, radians=math.pi, ctrl_a=-1, ctrl_b=-1, swap=-1):
         self.node_type = node_type
         self.radians = radians
         self.ctrl_a = ctrl_a

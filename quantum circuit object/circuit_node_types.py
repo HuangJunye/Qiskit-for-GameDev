@@ -58,7 +58,7 @@ CTRL = 'ct'  # "control" part of multi-qubit gate
 TRACE = 'tr'  # In the path between a gate part and a "control" or "swap" part
 
 normal_nodes = [
-    IDEN,
+    ID,
     S,
     SDG,
     T,
