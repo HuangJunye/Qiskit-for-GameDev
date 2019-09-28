@@ -71,20 +71,23 @@ class CircuitGridModel:
                               " on wire: ", gate_qubit_index)
         return gate_qubit_index
 
+    def qasm_for_normal_node(self, node_type, qubit_index):
+        return node_type + ' q[' + str(qubit_index) + '];'
+
     def create_qasm_for_node(self, circuit_grid_node, qubit_index):
         qasm_str = ""
         node_type = circuit_grid_node.node_type
         if node_type == circuit_node_types.IDEN:
             # identity gate
-            qasm_str += node_type + ' q[' + str(qubit_index) + '];'
+            qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
         elif node_type == circuit_node_types.X or \
                 node_type == circuit_node_types.Y or \
                 node_type == circuit_node_types.Z:
             # X, Y, Z gate
-            qasm_str += node_type + ' q[' + str(qubit_index) + '];'
+            qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
         elif node_type == circuit_node_types.H:
             # Hadamard gate
-            qasm_str += node_type + ' q[' + str(qubit_index) + '];'
+            qasm_str += self.qasm_for_normal_node(node_type, qubit_index)
 
         return qasm_str
 
