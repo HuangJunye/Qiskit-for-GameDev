@@ -59,21 +59,55 @@ TRACE = 'tr'  # In the path between a gate part and a "control" or "swap" part
 
 normal_nodes = [
     ID,
+    X,
+    Y,
+    Z,
+    H,
     S,
     SDG,
     T,
-    TDG
+    TDG,
+    BARRIER,
+    RESET
 ]
 
 controllable_nodes = [
     H,
     X,
     Y,
-    Z
+    Z,
+    RZ,
+    U1,
+    U3
+]
+
+controlled_nodes = [
+    CH,
+    CX,
+    CY,
+    CZ,
+    CRZ,
+    CU1,
+    CU3
+]
+
+ccxable_nodes = [
+    X,
+    CX
+]
+
+ccxed_nodes = [
+    CCX
 ]
 
 rotatable_nodes = [
     X,
     Y,
     Z
+]
+
+rotated_nodes = [
+    RX,
+    RY,
+    RZ
 ]
