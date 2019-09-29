@@ -29,12 +29,21 @@ class CircuitGridModel:
         return f'CircuitGridModel: {gate_array_string}'
 
     def set_node(self, qubit_index, depth_index, circuit_grid_node):
+        ctrl_a = circuit_grid_node.ctrl_a
+        ctrl_b = circuit_grid_node.ctrl_b
+        
         self.circuit_grid[qubit_index][depth_index] = \
             CircuitGridNode(circuit_grid_node.node_type,
                             circuit_grid_node.radians,
                             circuit_grid_node.ctrl_a,
                             circuit_grid_node.ctrl_b,
                             circuit_grid_node.swap)
+
+        if ctrl_a != -1:
+            self.circuit_grid[ctrl_a][depth_index] = CircuitGridNode(node_types.CTRL)
+
+        if ctrl_b != -1:
+            self.circuit_grid[ctrl_b][depth_index] = CircuitGridNode(node_types.CTRL)
 
     def get_node(self, qubit_index, depth_index):
         return self.circuit_grid[qubit_index][depth_index]
@@ -148,7 +157,7 @@ class CircuitGridNode:
 
     def __str__(self):
         string = f'type: {self.node_type}'
-        string += f', radians: {self.radians}' if self.radians != 0 else ''
+        string += f', radians: {self.radians}' if self.radians != math.pi else ''
         string += f', ctrl_a: {self.ctrl_a}' if self.ctrl_a != -1 else ''
         string += f', ctrl_b: {self.ctrl_b}' if self.ctrl_b != -1 else ''
         return string
