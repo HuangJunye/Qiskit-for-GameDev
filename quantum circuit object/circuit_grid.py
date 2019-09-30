@@ -17,7 +17,7 @@ class CircuitGridModel:
         # initialize empty circuit_grid
         for depth_index in range(self.circuit_depth):
             for qubit_index in range(self.qubit_count):
-                self.set_node(qubit_index, depth_index, CircuitGridNode(node_types.EMPTY))
+                self.set_node(qubit_index, depth_index, CircuitGridNode(node_types.EMPTY, qubit_index))
 
         self.threshold = 0.0001
 
@@ -30,21 +30,13 @@ class CircuitGridModel:
         return f'CircuitGridModel: {gate_array_string}'
 
     def set_node(self, qubit_index, depth_index, circuit_grid_node):
-        ctrl_a = circuit_grid_node.ctrl_a
-        ctrl_b = circuit_grid_node.ctrl_b
+        self.circuit_grid[qubit_index][depth_index] = circuit_grid_node
 
-        self.circuit_grid[qubit_index][depth_index] = \
-            CircuitGridNode(circuit_grid_node.node_type,
-                            circuit_grid_node.radians,
-                            circuit_grid_node.ctrl_a,
-                            circuit_grid_node.ctrl_b,
-                            circuit_grid_node.swap)
+        if circuit_grid_node.ctrl_a is not None:
+            self.circuit_grid[ctrl_a][depth_index] = CircuitGridNode(node_types.CTRL, ctrl_a)
 
-        if ctrl_a != -1:
-            self.circuit_grid[ctrl_a][depth_index] = CircuitGridNode(node_types.CTRL)
-
-        if ctrl_b != -1:
-            self.circuit_grid[ctrl_b][depth_index] = CircuitGridNode(node_types.CTRL)
+        if circuit_grid_node.ctrl_b is not None:
+            self.circuit_grid[ctrl_b][depth_index] = CircuitGridNode(node_types.CTRL, ctrl_b)
 
     def get_node(self, qubit_index, depth_index):
         return self.circuit_grid[qubit_index][depth_index]
@@ -86,11 +78,12 @@ class CircuitGridModel:
     def create_qasm_for_circuit(self):
         qasm_str = 'OPENQASM 2.0;include "qelib1.inc";'  # include header
         qasm_str += f'qreg q[{self.qubit_count}];'  # define quantum registers
-        qasm_str += 'id q;'  # add a column of identity gates to protect simulators from an empty circuit
+        # add a column of identity gates to protect simulators from an empty circuit
+        qasm_str += 'id q;'
 
         for depth_index in range(self.circuit_depth):
             for qubit_index in range(self.qubit_count):
-                qasm_str += self.create_qasm_for_node(self.circuit_grid[qubit_index][depth_index], qubit_index)
+                qasm_str += self.circuit_grid[qubit_index][depth_index].qasm()
         return qasm_str
 
     def reset_circuit(self):
@@ -171,9 +164,12 @@ class CircuitGridNode:
 
     def qasm(self):
         """generate qasm for the node"""
+        if self.node_type == node_types.EMPTY:
+            return ''
+
         # for measurement
         if self.node_type == node_types.MEASURE_Z:
-            return f'{self.node_type} q[{self.qubit_index}] -> c[{self.qubit_index}]'
+            return f'{self.node_type} q[{self.qubit_index}] -> c[{self.qubit_index}];'
 
         # rotation angle parameters
         rotation = ''
@@ -198,8 +194,8 @@ class CircuitGridNode:
         qubits += f'q[{self.qubit_index}]'
 
         if rotation:
-            qasm_str = f'{self.node_type}({rotation}) {qubits}'
+            qasm_str = f'{self.node_type}({rotation}) {qubits};'
         else:
-            qasm_str = f'{self.node_type} {qubits}'
+            qasm_str = f'{self.node_type} {qubits};'
 
         return qasm_str
