@@ -185,11 +185,11 @@ class CircuitGridNode:
 
         qubits = ''
         if self.ctrl_a is not None:
-            qubits += f'q[{self.ctrl_a}], '
+            qubits += f'q[{self.ctrl_a}],'
             if self.ctrl_b is not None:
-                qubits += f'q[{self.ctrl_b}], '
+                qubits += f'q[{self.ctrl_b}],'
         if self.swap is not None:
-            qubits += f'q[{self.swap}], '
+            qubits += f'q[{self.swap}],'
 
         qubits += f'q[{self.qubit_index}]'
 
