@@ -113,6 +113,7 @@ class CircuitGridNode:
 
     def __str__(self):
         string = f'type: {self.node_type}'
+        string += f', qubit index: {self.qubit_index}' if self.qubit_index is not None else ''
         string += f', theta: {self.theta}' if self.theta is not None else ''
         string += f', phi: {self.phi}' if self.phi is not None else ''
         string += f', lam: {self.lam}' if self.lam is not None else ''
