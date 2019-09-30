@@ -165,14 +165,13 @@ class CircuitGridNode:
                 if self.node_type != node_types.CCX:
                     self.node_type = node_types.CCX
         else:
-            self.ctrl_a = None
             self.ctrl_b = None
             #logging.warning(f'"{self.node_type}" gate cannot be converted to CCX gate!')
 
     def qasm(self):
         """generate qasm for the node"""
-        # no qasm for empty node
-        if self.node_type == node_types.EMPTY:
+        # no qasm for null nodes: empty and control nodes
+        if self.node_type in node_types.null_nodes:
             return ''
 
         # for measurement

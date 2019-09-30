@@ -58,6 +58,11 @@ IF = 'if'
 CTRL = 'ct'  # "control" part of multi-qubit gate
 TRACE = 'tr'  # In the path between a gate part and a "control" or "swap" part
 
+null_nodes = [
+    EMPTY,
+    CTRL
+]
+
 normal_nodes = [
     ID,
     X,
