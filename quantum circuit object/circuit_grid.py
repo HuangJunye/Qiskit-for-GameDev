@@ -17,7 +17,7 @@ class CircuitGridModel:
         # initialize empty circuit_grid
         for depth_index in range(self.circuit_depth):
             for qubit_index in range(self.qubit_count):
-                self.set_node(CircuitGridNode(node_types.EMPTY, qubit_index), depth_index)
+                self.set_node(qubit_index, depth_index, CircuitGridNode(node_types.EMPTY))
 
         self.threshold = 0.0001
 
@@ -29,13 +29,16 @@ class CircuitGridModel:
                 gate_array_string += f'{self.get_node_type(qubit_index, depth_index)}, '
         return f'CircuitGridModel: {gate_array_string}'
 
-    def set_node(self, circuit_grid_node, depth_index):
-        self.circuit_grid[circuit_grid_node.qubit_index][depth_index] = circuit_grid_node
+    def set_node(self, qubit_index, depth_index, circuit_grid_node):
+        circuit_grid_node.qubit_index = qubit_index # overwrite node qubit_index
+        ctrl_a = circuit_grid_node.ctrl_a
+        ctrl_b = circuit_grid_node.ctrl_b
+        self.circuit_grid[qubit_index][depth_index] = circuit_grid_node
 
-        if circuit_grid_node.ctrl_a is not None:
+        if ctrl_a is not None:
             self.circuit_grid[ctrl_a][depth_index] = CircuitGridNode(node_types.CTRL, ctrl_a)
 
-        if circuit_grid_node.ctrl_b is not None:
+        if ctrl_b is not None:
             self.circuit_grid[ctrl_b][depth_index] = CircuitGridNode(node_types.CTRL, ctrl_b)
 
     def get_node(self, qubit_index, depth_index):
@@ -96,7 +99,7 @@ class CircuitGridNode:
     A node is usually a gate.
     """
 
-    def __init__(self, node_type, qubit_index, theta=None, phi=None, lam=None, \
+    def __init__(self, node_type, qubit_index=None, theta=None, phi=None, lam=None, \
                                         ctrl_a=None, ctrl_b=None, swap=None):
         self.node_type = node_type
         self.qubit_index = qubit_index
