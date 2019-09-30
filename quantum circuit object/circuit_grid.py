@@ -2,6 +2,7 @@ import numpy as np
 from sympy import pi
 
 import circuit_node_types as node_types
+import logging
 
 
 class CircuitGridModel:
@@ -78,7 +79,7 @@ class CircuitGridModel:
                     if other_node.ctrl_a == control_qubit_index or \
                             other_node.ctrl_b == control_qubit_index:
                         gate_qubit_index = qubit_index
-                        print(f'Found gate: {self.get_node_type(gate_qubit_index, depth_index)} '
+                        logging.info(f'Found gate: {self.get_node_type(gate_qubit_index, depth_index)} '
                               f'on qubit: {gate_qubit_index}')
         return gate_qubit_index
 
@@ -128,40 +129,42 @@ class CircuitGridNode:
         return
 
     def rotate_node(self, theta):
-        self.theta = theta
         threshold = 0.0001
-        if self.node_type in node_types.rotatable_nodes \
-                                or node_types.rotated_nodes:
+        if (self.node_type in node_types.rotatable_nodes) \
+                                or (self.node_type in node_types.rotated_nodes):
+            self.theta = theta
+
             if theta is not None:
                 if abs(theta - pi) > threshold:
-                    if self.node_type not in node_types.rotated_nodes:
+                    if self.node_type in node_types.rotatable_nodes:
                         self.node_type = f'r{self.node_type}'
                 else:
                     if self.node_type in node_types.rotated_nodes:
                         self.node_type.replace('r','')  # remove r
         else:
-            print('this gate cannot be rotated!')
+            self.theta = None
+            logging.warning(f'"{self.node_type}" gate cannot be rotated!')
 
     def add_control_node(self, ctrl_a):
         self.ctrl_a = ctrl_a
-        if self.node_type in node_types.controllable_nodes \
-                                or node_types.controlled_nodes:
+        if (self.node_type in node_types.controllable_nodes) \
+                                or (self.node_type in node_types.controlled_nodes):
             if ctrl_a is not None:
                 if self.node_type not in node_types.controlled_nodes:
                     self.node_type = f'c{self.node_type}'
         else:
-            print('this gate cannot be controlled!')
+            logging.warning(f'"{self.node_type}" gate cannot be controlled!')
 
     def add_control_control_node(self, ctrl_a, ctrl_b):
         self.ctrl_a = ctrl_a
         self.ctrl_b = ctrl_b
-        if self.node_type in node_types.ccxable_nodes \
-                                or node_types.ccxed_nodes:
+        if (self.node_type in node_types.ccxable_nodes) \
+                                or (self.node_type in node_types.ccxed_nodes):
             if (ctrl_a is not None) and (ctrl_b is not None):
                 if self.node_type != node_types.CCX:
                     self.node_type = node_types.CCX
         else:
-            print('this gate cannot be converted to CCX gate!')
+            logging.warning(f'"{self.node_type}" gate cannot be converted to CCX gate!')
 
     def qasm(self):
         if self.node_type in node_types.normal_nodes:
