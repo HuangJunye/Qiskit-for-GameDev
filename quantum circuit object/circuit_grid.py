@@ -1,5 +1,5 @@
 import numpy as np
-import math
+from sympy import pi
 
 import circuit_node_types as node_types
 
@@ -116,7 +116,7 @@ class CircuitGridNode:
 
     def __str__(self):
         string = f'type: {self.node_type}'
-        string += f', radians: {self.theta}' if self.theta != math.pi else ''
+        string += f', radians: {self.theta}' if self.theta != pi else ''
         string += f', ctrl_a: {self.ctrl_a}' if self.ctrl_a != -1 else ''
         string += f', ctrl_b: {self.ctrl_b}' if self.ctrl_b != -1 else ''
         return string
@@ -133,7 +133,7 @@ class CircuitGridNode:
         if self.node_type in node_types.rotatable_nodes \
                                 or node_types.rotated_nodes:
             if theta is not None:
-                if abs(theta - math.pi) > threshold:
+                if abs(theta - pi) > threshold:
                     if self.node_type not in node_types.rotated_nodes:
                         self.node_type = f'r{self.node_type}'
                 else:
@@ -179,9 +179,9 @@ class CircuitGridNode:
 
         qubits = ''
         if self.ctrl_a is not None:
-            qubits += f'q[{self.ctrl_a}] '
+            qubits += f'q[{self.ctrl_a}], '
             if self.ctrl_b is not None:
-                qubits += f'q[{self.ctrl_b}] '
+                qubits += f'q[{self.ctrl_b}], '
 
         qubits += f'q[{self.qubit_index}]'
 
