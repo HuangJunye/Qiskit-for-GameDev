@@ -102,9 +102,13 @@ class CircuitGridNode:
     A node is usually a gate.
     """
 
-    def __init__(self, node_type, radians=math.pi, ctrl_a=-1, ctrl_b=-1, swap=-1):
+    def __init__(self, node_type, qubit_index, theta=None, phi=None, lam=None, \
+                                        ctrl_a=None, ctrl_b=None, swap=None):
         self.node_type = node_type
-        self.radians = radians
+        self.qubit_index = qubit_index
+        self.theta = theta
+        self.phi = phi
+        self.lam = lam
         self.ctrl_a = ctrl_a
         self.ctrl_b = ctrl_b
         self.swap = swap
@@ -112,28 +116,29 @@ class CircuitGridNode:
 
     def __str__(self):
         string = f'type: {self.node_type}'
-        string += f', radians: {self.radians}' if self.radians != math.pi else ''
+        string += f', radians: {self.theta}' if self.theta != math.pi else ''
         string += f', ctrl_a: {self.ctrl_a}' if self.ctrl_a != -1 else ''
         string += f', ctrl_b: {self.ctrl_b}' if self.ctrl_b != -1 else ''
         return string
 
     def update_node_type(self):
-        self.rotate_node(self.radians)
+        self.rotate_node(self.theta)
         self.add_control_node(self.ctrl_a)
         self.add_control_control_node(self.ctrl_a, self.ctrl_b)
         return
 
-    def rotate_node(self, radians):
-        self.radians = radians
+    def rotate_node(self, theta):
+        self.theta = theta
         threshold = 0.0001
         if self.node_type in node_types.rotatable_nodes \
                                 or node_types.rotated_nodes:
-            if abs(radians - math.pi) > threshold:
-                if self.node_type not in node_types.rotated_nodes:
-                    self.node_type = f'r{self.node_type}'
-            else:
-                if self.node_type in node_types.rotated_nodes:
-                    self.node_type.replace('r','')  # remove r
+            if theta is not None:
+                if abs(theta - math.pi) > threshold:
+                    if self.node_type not in node_types.rotated_nodes:
+                        self.node_type = f'r{self.node_type}'
+                else:
+                    if self.node_type in node_types.rotated_nodes:
+                        self.node_type.replace('r','')  # remove r
         else:
             print('this gate cannot be rotated!')
 
@@ -141,7 +146,7 @@ class CircuitGridNode:
         self.ctrl_a = ctrl_a
         if self.node_type in node_types.controllable_nodes \
                                 or node_types.controlled_nodes:
-            if ctrl_a != -1:
+            if ctrl_a is not None:
                 if self.node_type not in node_types.controlled_nodes:
                     self.node_type = f'c{self.node_type}'
         else:
@@ -152,50 +157,38 @@ class CircuitGridNode:
         self.ctrl_b = ctrl_b
         if self.node_type in node_types.ccxable_nodes \
                                 or node_types.ccxed_nodes:
-            if (ctrl_a != -1) and (ctrl_b != -1):
+            if (ctrl_a is not None) and (ctrl_b is not None):
                 if self.node_type != node_types.CCX:
                     self.node_type = node_types.CCX
         else:
             print('this gate cannot be converted to CCX gate!')
 
-    def qasm(self, circuit_grid_node, qubit_index):
-        node_type = circuit_grid_node.node_type
-        radians = circuit_grid_node.radians
-        ctrl_a = circuit_grid_node.ctrl_a
-        ctrl_b = circuit_grid_node.ctrl_b
-        swap = circuit_grid_node.swap
+    def qasm(self):
+        if self.node_type in node_types.normal_nodes:
+            qasm_str = f'{self.node_type} q[{self.qubit_index}]'
 
-        if node_type in node_types.normal_nodes:
-            # normal nodes: id, x, y, z, h, s, sdg, t, tdg, barrier, reset
-            qasm_str = self.qasm_for_normal_node(node_type, qubit_index)
-
-        if node_type in node_types.rotated_nodes:
-            # rotated_nodes: rx, ry, rz
-            qasm_str = self.qasm_for_rotated_node(circuit_grid_node, qubit_index)
-
-        if node_type in node_types.controlled_nodes:
-            # controlled_nodes: ch, cx, cy, cz, crz, cu1, cu3
-            qasm_str = self.qasm_for_controlled_node(circuit_grid_node, qubit_index)
-        return qasm_str
-
-    def qasm_for_normal_node(self, node_type, qubit_index):
-        return f'{node_type} q[{qubit_index}];'
-
-    def qasm_for_controlled_node(self, circuit_grid_node, qubit_index):
-        node_type = circuit_grid_node.node_type
-        ctrl_a = circuit_grid_node.ctrl_a
-
-        if ctrl_a == -1:
-            # normal gate
-            qasm_str = f'{node_type} q[{qubit_index}];'
+        rotation = ''
+        if self.theta is not None:
+            rotation += f'{self.theta}'
+            if self.phi is not None:
+                rotation += f',{self.phi}'
+                if self.lam is not None:
+                    rotation += f',{self.lam}'
         else:
-            # controlled gate
-            qasm_str = f'c{node_type} q[{ctrl_a}], q[{qubit_index}];'
-        return qasm_str
+            rotation = None
 
-    def qasm_for_rotated_node(self, circuit_grid_node, qubit_index):
-        node_type = circuit_grid_node.node_type
-        radians = circuit_grid_node.radians
+        qubits = ''
+        if self.ctrl_a is not None:
+            qubits += f'q[{self.ctrl_a}] '
+            if self.ctrl_b is not None:
+                qubits += f'q[{self.ctrl_b}] '
 
-        qasm_str = f'r{node_type}({radians}) q[{qubit_index}];'
+        qubits += f'q[{self.qubit_index}]'
+
+
+        if rotation:
+            qasm_str = f'{self.node_type}({rotation}) {qubits}'
+        else:
+            qasm_str = f'{self.node_type} {qubits}'
+
         return qasm_str

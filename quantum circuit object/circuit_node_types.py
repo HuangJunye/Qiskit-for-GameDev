@@ -109,5 +109,11 @@ rotatable_nodes = [
 rotated_nodes = [
     RX,
     RY,
-    RZ
+    RZ,
+    U1,
+    U2,
+    U3,
+    CU1,
+    CU3,
+    CRZ
 ]
