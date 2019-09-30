@@ -48,6 +48,7 @@ CU3 = 'cu3'
 CCX = 'ccx'
 
 SWAP = 'swap'
+CSWAP = 'cswap'
 
 BARRIER = 'barrier'
 MEASURE_Z = 'measure'
@@ -78,7 +79,8 @@ controllable_nodes = [
     Z,
     RZ,
     U1,
-    U3
+    U3,
+    SWAP
 ]
 
 controlled_nodes = [
@@ -88,7 +90,8 @@ controlled_nodes = [
     CZ,
     CRZ,
     CU1,
-    CU3
+    CU3,
+    CSWAP
 ]
 
 ccxable_nodes = [
