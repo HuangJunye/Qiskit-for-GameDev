@@ -29,7 +29,7 @@ class CircuitGridModel:
                 gate_array_string += f'{self.get_node_type(qubit_index, depth_index)}, '
         return f'CircuitGridModel: {gate_array_string}'
 
-    def set_node(self, depth_index, circuit_grid_node):
+    def set_node(self, circuit_grid_node, depth_index):
         self.circuit_grid[circuit_grid_node.qubit_index][depth_index] = circuit_grid_node
 
         if circuit_grid_node.ctrl_a is not None:
