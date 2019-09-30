@@ -117,9 +117,12 @@ class CircuitGridNode:
 
     def __str__(self):
         string = f'type: {self.node_type}'
-        string += f', radians: {self.theta}' if self.theta != pi else ''
-        string += f', ctrl_a: {self.ctrl_a}' if self.ctrl_a != -1 else ''
-        string += f', ctrl_b: {self.ctrl_b}' if self.ctrl_b != -1 else ''
+        string += f', theta: {self.theta}' if self.theta is not None else ''
+        string += f', phi: {self.phi}' if self.phi is not None else ''
+        string += f', lam: {self.lam}' if self.lam is not None else ''
+        string += f', ctrl_a: {self.ctrl_a}' if self.ctrl_a is not None else ''
+        string += f', ctrl_b: {self.ctrl_b}' if self.ctrl_b is not None else ''
+        string += f', swap: {self.swap}' if self.swap is not None else ''
         return string
 
     def update_node_type(self):
