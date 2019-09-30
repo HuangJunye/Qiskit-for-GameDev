@@ -17,7 +17,7 @@ class CircuitGridModel:
         # initialize empty circuit_grid
         for depth_index in range(self.circuit_depth):
             for qubit_index in range(self.qubit_count):
-                self.set_node(depth_index, CircuitGridNode(node_types.EMPTY, qubit_index))
+                self.set_node(CircuitGridNode(node_types.EMPTY, qubit_index), depth_index)
 
         self.threshold = 0.0001
 
@@ -139,31 +139,35 @@ class CircuitGridNode:
                         self.node_type.replace('r','')  # remove r
         else:
             self.theta = None
-            logging.warning(f'"{self.node_type}" gate cannot be rotated!')
+            #logging.warning(f'"{self.node_type}" gate cannot be rotated!')
 
     def add_control_node(self, ctrl_a):
-        self.ctrl_a = ctrl_a
         if (self.node_type in node_types.controllable_nodes) \
                                 or (self.node_type in node_types.controlled_nodes):
+            self.ctrl_a = ctrl_a
             if ctrl_a is not None:
                 if self.node_type not in node_types.controlled_nodes:
                     self.node_type = f'c{self.node_type}'
         else:
-            logging.warning(f'"{self.node_type}" gate cannot be controlled!')
+            self.ctrl_a = None
+            #logging.warning(f'"{self.node_type}" gate cannot be controlled!')
 
     def add_control_control_node(self, ctrl_a, ctrl_b):
-        self.ctrl_a = ctrl_a
-        self.ctrl_b = ctrl_b
         if (self.node_type in node_types.ccxable_nodes) \
                                 or (self.node_type in node_types.ccxed_nodes):
+            self.ctrl_a = ctrl_a
+            self.ctrl_b = ctrl_b
             if (ctrl_a is not None) and (ctrl_b is not None):
                 if self.node_type != node_types.CCX:
                     self.node_type = node_types.CCX
         else:
-            logging.warning(f'"{self.node_type}" gate cannot be converted to CCX gate!')
+            self.ctrl_a = None
+            self.ctrl_b = None
+            #logging.warning(f'"{self.node_type}" gate cannot be converted to CCX gate!')
 
     def qasm(self):
         """generate qasm for the node"""
+        # no qasm for empty node
         if self.node_type == node_types.EMPTY:
             return ''
 
