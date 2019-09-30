@@ -170,9 +170,12 @@ class CircuitGridNode:
             logging.warning(f'"{self.node_type}" gate cannot be converted to CCX gate!')
 
     def qasm(self):
-        if self.node_type in node_types.normal_nodes:
-            qasm_str = f'{self.node_type} q[{self.qubit_index}]'
+        """generate qasm for the node"""
+        # for measurement
+        if self.node_type == node_types.MEASURE_Z:
+            return f'{self.node_type} q[{self.qubit_index}] -> c[{self.qubit_index}]'
 
+        # rotation angle parameters
         rotation = ''
         if self.theta is not None:
             rotation += f'{self.theta}'
@@ -183,6 +186,7 @@ class CircuitGridNode:
         else:
             rotation = None
 
+        # qubit indices
         qubits = ''
         if self.ctrl_a is not None:
             qubits += f'q[{self.ctrl_a}],'
@@ -192,7 +196,6 @@ class CircuitGridNode:
             qubits += f'q[{self.swap}],'
 
         qubits += f'q[{self.qubit_index}]'
-
 
         if rotation:
             qasm_str = f'{self.node_type}({rotation}) {qubits}'
