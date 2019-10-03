@@ -20,10 +20,10 @@ import pygame
 
 from ..model import circuit_node_types as node_types
 from ..model.circuit_grid_model import CircuitGridNode
-from ..utils.colors import BLACK, WHITE, MAGENTA
-from ..utils.navigation import MOVE_UP, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT
+from ..utils.colors import *
+from ..utils.navigation import *
 from ..utils.resources import load_image
-from ..utils.parameters import WIDTH_UNIT, LINE_WIDTH, GRID_HEIGHT, GRID_WIDTH, GATE_TILE_WIDTH, GATE_TILE_HEIGHT
+from ..utils.parameters import *
 
 
 class CircuitGrid(pygame.sprite.RenderPlain):
