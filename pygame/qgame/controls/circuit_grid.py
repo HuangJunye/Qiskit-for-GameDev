@@ -96,7 +96,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         self.highlight_selected_node(self.selected_wire, self.selected_column)
 
     def get_selected_node_gate_part(self):
-        return self.circuit_grid_model.get_node_gate_part(self.selected_wire, self.selected_column)
+        return self.circuit_grid_model.get_node_type(self.selected_wire, self.selected_column)
 
     def handle_input_x(self):
         # Add X gate regardless of whether there is an existing gate
@@ -180,7 +180,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                 # Remove TRACE nodes
                 for qubit_index in range(min(self.selected_wire, orig_ctrl_a) + 1,
                                       max(self.selected_wire, orig_ctrl_a)):
-                    if self.circuit_grid_model.get_node_gate_part(qubit_index,
+                    if self.circuit_grid_model.get_node_type(qubit_index,
                                                                   self.selected_column) == node_types.TRACE:
                         self.circuit_grid_model.set_node(qubit_index, self.selected_column,
                                                          CircuitGridNode(node_types.EMPTY))
@@ -219,12 +219,12 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                     if self.place_ctrl_qubit(self.selected_wire, candidate_qubit_index) == candidate_qubit_index:
                         print("control qubit successfully placed on wire ", candidate_qubit_index)
                         if direction == MOVE_UP and candidate_qubit_index < self.selected_wire:
-                            if self.circuit_grid_model.get_node_gate_part(candidate_qubit_index + 1,
+                            if self.circuit_grid_model.get_node_type(candidate_qubit_index + 1,
                                                                           self.selected_column) == node_types.EMPTY:
                                 self.circuit_grid_model.set_node(candidate_qubit_index + 1, self.selected_column,
                                                                  CircuitGridNode(node_types.TRACE))
                         elif direction == MOVE_DOWN and candidate_qubit_index > self.selected_wire:
-                            if self.circuit_grid_model.get_node_gate_part(candidate_qubit_index - 1,
+                            if self.circuit_grid_model.get_node_type(candidate_qubit_index - 1,
                                                                           self.selected_column) == node_types.EMPTY:
                                 self.circuit_grid_model.set_node(candidate_qubit_index - 1, self.selected_column,
                                                                  CircuitGridNode(node_types.TRACE))
@@ -250,7 +250,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         if candidate_ctrl_qubit_index < 0 or candidate_ctrl_qubit_index >= self.circuit_grid_model.qubit_count:
             return -1
         candidate_wire_gate_part = \
-            self.circuit_grid_model.get_node_gate_part(candidate_ctrl_qubit_index,
+            self.circuit_grid_model.get_node_type(candidate_ctrl_qubit_index,
                                                        self.selected_column)
         if candidate_wire_gate_part == node_types.EMPTY or \
                 candidate_wire_gate_part == node_types.TRACE:
