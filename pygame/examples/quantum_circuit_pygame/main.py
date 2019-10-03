@@ -28,7 +28,8 @@ sys.path.append('/Users/kirais/Documents/GitHub/Qiskit-for-GameDev/pygame/')
 
 import qgame
 
-from qgame import CircuitGridModel, CircuitDiagram, MeasurementsHistogram, QSphere, StatevectorGrid, UnitaryGrid
+from qgame import CircuitGridModel, CircuitGridNode, \
+    CircuitDiagram, MeasurementsHistogram, QSphere, StatevectorGrid, UnitaryGrid
 from qgame import circuit_node_types as node_types
 from qgame.containers import VBox
 from qgame.utils.colors import WHITE
@@ -69,7 +70,7 @@ def main():
 
     circuit_grid_model = CircuitGridModel(4, 18)
 
-    circuit_grid_model.set_node(0, 0, CircuitGridNode(node_types.IDEN))
+    circuit_grid_model.set_node(0, 0, CircuitGridNode(node_types.ID))
 
     # circuit_grid_model.set_node(0, 1, CircuitGridNode(node_types.H))
 
