@@ -31,9 +31,9 @@ import qgame
 from qgame import CircuitGridModel, CircuitDiagram, MeasurementsHistogram, QSphere, StatevectorGrid, UnitaryGrid
 from qgame import circuit_node_types as node_types
 from qgame.containers import VBox
-from qgame.colors import WHITE
-from qgame.navigation import *
-from qgame.gamepad import *
+from qgame.utils.colors import WHITE
+from qgame.utils.navigation import *
+from qgame.utils.gamepad import *
 from qgame.controls.circuit_grid import *
 
 WINDOW_SIZE = 1500, 1000
