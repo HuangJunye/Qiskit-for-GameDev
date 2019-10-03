@@ -22,26 +22,19 @@
 import pygame
 from pygame.locals import *
 
-from pygame/qiskit-pygame impor
+import sys
+# replace the path with the path to Qiskit-for-GameDev folder on your computer
+sys.path.append('/Users/kirais/Documents/GitHub/Qiskit-for-GameDev/pygame/')
 
-import importlib.util
-spec = importlib.util.spec_from_file_location("module.name", "pygame/qiskit-pygame")
-foo = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(foo)
-foo.MyClass()
+import qgame
 
-from model.circuit_grid_model import *
-from model import circuit_node_types as node_types
-from containers.vbox import VBox
-from utils.colors import WHITE
-from utils.navigation import *
-from utils.gamepad import *
-from viz.circuit_diagram import CircuitDiagram
-from viz.measurements_histogram import MeasurementsHistogram
-from viz.qsphere import QSphere
-from viz.statevector_grid import StatevectorGrid
-from viz.unitary_grid import UnitaryGrid
-from controls.circuit_grid import *
+from qgame import CircuitGridModel, CircuitDiagram, MeasurementsHistogram, QSphere, StatevectorGrid, UnitaryGrid
+from qgame import circuit_node_types as node_types
+from qgame.containers import VBox
+from qgame.colors import WHITE
+from qgame.navigation import *
+from qgame.gamepad import *
+from qgame.controls.circuit_grid import *
 
 WINDOW_SIZE = 1500, 1000
 

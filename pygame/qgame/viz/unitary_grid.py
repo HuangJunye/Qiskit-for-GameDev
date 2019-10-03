@@ -18,7 +18,7 @@ import pygame
 from qiskit import BasicAer, execute
 
 from ..utils.colors import *
-from ..utils.fonts import *
+from ..utils.fonts import ARIAL_16
 from .. import comp_basis_states
 
 
