@@ -9,3 +9,4 @@ qiskit flask server/model/__pycache__/circuit_node_types.cpython-37.pyc
 qiskit flask server/server/__pycache__/api.cpython-37.pyc
 *.iml
 *.xml
+*.pyc

@@ -1,197 +1,207 @@
-#
-# Copyright 2019 the original author or authors.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
 import numpy as np
+from sympy import pi
 
-from qiskit import QuantumCircuit, QuantumRegister
-
-from model import circuit_node_types as node_types
-from utils.parameters import CIRCUIT_DEPTH
+import circuit_node_types
+import logging
 
 
 class CircuitGridModel:
-    """Grid-based model that is built when user interacts with circuit"""
-    def __init__(self, max_wires, max_columns):
-        self.max_wires = max_wires
-        self.max_columns = max_columns
-        self.nodes = np.empty((max_wires, max_columns), dtype=CircuitGridNode)
+    """
+    Grid-based model that is built when user interacts with circuit
+    """
+
+    def __init__(self, qubit_count, circuit_depth):
+        self.qubit_count = qubit_count
+        self.circuit_depth = circuit_depth
+        self.circuit_grid = np.empty((qubit_count, circuit_depth), dtype=CircuitGridNode)
+        # initialize empty circuit_grid
+        for depth_index in range(self.circuit_depth):
+            for qubit_index in range(self.qubit_count):
+                self.set_node(qubit_index, depth_index, CircuitGridNode(circuit_node_types.EMPTY))
 
     def __str__(self):
-        retval = ''
-        for wire_num in range(self.max_wires):
-            retval += '\n'
-            for column_num in range(self.max_columns):
-                retval += str(self.get_node_gate_part(wire_num, column_num)) + ', '
-        return 'CircuitGridModel: ' + retval
+        gate_array_string = ''
+        for qubit_index in range(self.qubit_count):
+            gate_array_string += '\n'
+            for depth_index in range(self.circuit_depth):
+                gate_array_string += f'{self.get_node_type(qubit_index, depth_index)}, '
+        return f'CircuitGridModel: {gate_array_string}'
 
-    def set_node(self, wire_num, column_num, circuit_grid_node):
-        self.nodes[wire_num][column_num] = \
-            CircuitGridNode(circuit_grid_node.node_type,
-                            circuit_grid_node.radians,
-                            circuit_grid_node.ctrl_a,
-                            circuit_grid_node.ctrl_b,
-                            circuit_grid_node.swap)
+    def set_node(self, qubit_index, depth_index, circuit_grid_node):
+        circuit_grid_node.qubit_index = qubit_index # overwrite node qubit_index
+        ctrl_a = circuit_grid_node.ctrl_a
+        ctrl_b = circuit_grid_node.ctrl_b
+        self.circuit_grid[qubit_index][depth_index] = circuit_grid_node
 
-        # TODO: Decide whether to protect as shown below
-        # if not self.nodes[wire_num][column_num]:
-        #     self.nodes[wire_num][column_num] = CircuitGridNode(node_type, radians)
-        # else:
-        #     print('Node ', wire_num, column_num, ' not empty')
+        if ctrl_a is not None:
+            self.circuit_grid[ctrl_a][depth_index] = CircuitGridNode(circuit_node_types.CTRL, ctrl_a)
 
-    def get_node(self, wire_num, column_num):
-        return self.nodes[wire_num][column_num]
+        if ctrl_b is not None:
+            self.circuit_grid[ctrl_b][depth_index] = CircuitGridNode(circuit_node_types.CTRL, ctrl_b)
 
-    def get_node_gate_part(self, wire_num, column_num):
-        requested_node = self.nodes[wire_num][column_num]
-        if requested_node and requested_node.node_type != node_types.EMPTY:
+    def get_node(self, qubit_index, depth_index):
+        return self.circuit_grid[qubit_index][depth_index]
+
+    def get_node_type(self, qubit_index, depth_index):
+        requested_node = self.circuit_grid[qubit_index][depth_index]
+        if requested_node and requested_node.node_type != circuit_node_types.EMPTY:
             # Node is occupied so return its gate
             return requested_node.node_type
         else:
             # Check for control nodes from gates in other nodes in this column
-            nodes_in_column = self.nodes[:, column_num]
-            for idx in range(self.max_wires):
-                if idx != wire_num:
+            nodes_in_column = self.circuit_grid[:, depth_index]
+            for idx in range(self.qubit_count):
+                if idx != qubit_index:
                     other_node = nodes_in_column[idx]
                     if other_node:
-                        if other_node.ctrl_a == wire_num or other_node.ctrl_b == wire_num:
-                            return node_types.CTRL
-                        elif other_node.swap == wire_num:
-                            return node_types.SWAP
+                        if other_node.ctrl_a == qubit_index or other_node.ctrl_b == qubit_index:
+                            return circuit_node_types.CTRL
+                        elif other_node.swap == qubit_index:
+                            return circuit_node_types.SWAP
 
-        return node_types.EMPTY
+        return circuit_node_types.EMPTY
 
-    def get_gate_wire_for_control_node(self, control_wire_num, column_num):
-        """Get wire for gate that belongs to a control node on the given wire"""
-        gate_wire_num = -1
-        nodes_in_column = self.nodes[:, column_num]
-        for wire_idx in range(self.max_wires):
-            if wire_idx != control_wire_num:
-                other_node = nodes_in_column[wire_idx]
+    def get_gate_qubit_for_control_node(self, control_qubit_index, depth_index):
+        """Get qubit index for gate that belongs to a control node on the given qubit"""
+        gate_qubit_index = -1
+        nodes_in_column = self.circuit_grid[:, depth_index]
+        for qubit_index in range(self.qubit_count):
+            if qubit_index != control_qubit_index:
+                other_node = nodes_in_column[qubit_index]
                 if other_node:
-                    if other_node.ctrl_a == control_wire_num or \
-                            other_node.ctrl_b == control_wire_num:
-                        gate_wire_num =  wire_idx
-                        print("Found gate: ",
-                              self.get_node_gate_part(gate_wire_num, column_num),
-                              " on wire: " , gate_wire_num)
-        return gate_wire_num
+                    if other_node.ctrl_a == control_qubit_index or \
+                            other_node.ctrl_b == control_qubit_index:
+                        gate_qubit_index = qubit_index
+                        logging.info(f'Found gate: {self.get_node_type(gate_qubit_index, depth_index)} '
+                              f'on qubit: {gate_qubit_index}')
+        return gate_qubit_index
 
-    def compute_circuit(self):
-        qr = QuantumRegister(self.max_wires, 'q')
-        qc = QuantumCircuit(qr)
+    def create_qasm_for_circuit(self):
+        qasm_str = 'OPENQASM 2.0;include "qelib1.inc";'  # include header
+        qasm_str += f'qreg q[{self.qubit_count}];'  # define quantum registers
+        qasm_str += f'creg c[{self.qubit_count}];'  # define classical registers
+        # add a column of identity gates to protect simulators from an empty circuit
+        qasm_str += 'id q;'
 
-        for column_num in range(self.max_columns):
-            for wire_num in range(self.max_wires):
-                node = self.nodes[wire_num][column_num]
-                if node:
-                    if node.node_type == node_types.IDEN:
-                        # Identity gate
-                        qc.iden(qr[wire_num])
-                    elif node.node_type == node_types.X:
-                        if node.radians == 0:
-                            if node.ctrl_a != -1:
-                                if node.ctrl_b != -1:
-                                    # Toffoli gate
-                                    qc.ccx(qr[node.ctrl_a], qr[node.ctrl_b], qr[wire_num])
-                                else:
-                                    # Controlled X gate
-                                    qc.cx(qr[node.ctrl_a], qr[wire_num])
-                            else:
-                                # Pauli-X gate
-                                qc.x(qr[wire_num])
-                        else:
-                            # Rotation around X axis
-                            qc.rx(node.radians, qr[wire_num])
-                    elif node.node_type == node_types.Y:
-                        if node.radians == 0:
-                            if node.ctrl_a != -1:
-                                # Controlled Y gate
-                                qc.cy(qr[node.ctrl_a], qr[wire_num])
-                            else:
-                                # Pauli-Y gate
-                                qc.y(qr[wire_num])
-                        else:
-                            # Rotation around Y axis
-                            qc.ry(node.radians, qr[wire_num])
-                    elif node.node_type == node_types.Z:
-                        if node.radians == 0:
-                            if node.ctrl_a != -1:
-                                # Controlled Z gate
-                                qc.cz(qr[node.ctrl_a], qr[wire_num])
-                            else:
-                                # Pauli-Z gate
-                                qc.z(qr[wire_num])
-                        else:
-                            if node.ctrl_a != -1:
-                                # Controlled rotation around the Z axis
-                                qc.crz(node.radians, qr[node.ctrl_a], qr[wire_num])
-                            else:
-                                # Rotation around Z axis
-                                qc.rz(node.radians, qr[wire_num])
-                    elif node.node_type == node_types.S:
-                        # S gate
-                        qc.s(qr[wire_num])
-                    elif node.node_type == node_types.SDG:
-                        # S dagger gate
-                        qc.sdg(qr[wire_num])
-                    elif node.node_type == node_types.T:
-                        # T gate
-                        qc.t(qr[wire_num])
-                    elif node.node_type == node_types.TDG:
-                        # T dagger gate
-                        qc.tdg(qr[wire_num])
-                    elif node.node_type == node_types.H:
-                        if node.ctrl_a != -1:
-                            # Controlled Hadamard
-                            qc.ch(qr[node.ctrl_a], qr[wire_num])
-                        else:
-                            # Hadamard gate
-                            qc.h(qr[wire_num])
-                    elif node.node_type == node_types.SWAP:
-                        if node.ctrl_a != -1:
-                            # Controlled Swap
-                            qc.cswap(qr[node.ctrl_a], qr[wire_num], qr[node.swap])
-                        else:
-                            # Swap gate
-                            qc.swap(qr[wire_num], qr[node.swap])
-
-        return qc
+        for depth_index in range(self.circuit_depth):
+            for qubit_index in range(self.qubit_count):
+                qasm_str += self.circuit_grid[qubit_index][depth_index].qasm()
+        return qasm_str
 
     def reset_circuit(self):
-        self.nodes = np.empty((self.max_wires, self.max_columns),
-                              dtype=CircuitGridNode)
-        # the game crashes if the circuit is empty
-        # initialize circuit with 3 identity gate at the end to prevent crash
-        # identity gate are displayed by completely transparent PNG
-
-        for i in range(self.max_wires):
-            self.set_node(i, CIRCUIT_DEPTH - 1, CircuitGridNode(node_types.IDEN))
+        self.circuit_grid = np.empty((self.qubit_count, self.circuit_depth), dtype=CircuitGridNode)
 
 
 class CircuitGridNode:
-    """Represents a node in the circuit grid"""
-    def __init__(self, node_type, radians=0.0, ctrl_a=-1, ctrl_b=-1, swap=-1):
+    """
+    Represents a node in the circuit grid
+    A node is usually a gate.
+    """
+
+    def __init__(self, node_type, qubit_index=None, theta=None, phi=None, lam=None, \
+                                        ctrl_a=None, ctrl_b=None, swap=None):
         self.node_type = node_type
-        self.radians = radians
+        self.qubit_index = qubit_index
+        self.theta = theta
+        self.phi = phi
+        self.lam = lam
         self.ctrl_a = ctrl_a
         self.ctrl_b = ctrl_b
         self.swap = swap
+        self.update_node_type()
 
     def __str__(self):
-        string = 'type: ' + str(self.node_type)
-        string += ', radians: ' + str(self.radians) if self.radians != 0 else ''
-        string += ', ctrl_a: ' + str(self.ctrl_a) if self.ctrl_a != -1 else ''
-        string += ', ctrl_b: ' + str(self.ctrl_b) if self.ctrl_b != -1 else ''
+        string = f'type: {self.node_type}'
+        string += f', qubit index: {self.qubit_index}' if self.qubit_index is not None else ''
+        string += f', theta: {self.theta}' if self.theta is not None else ''
+        string += f', phi: {self.phi}' if self.phi is not None else ''
+        string += f', lam: {self.lam}' if self.lam is not None else ''
+        string += f', ctrl_a: {self.ctrl_a}' if self.ctrl_a is not None else ''
+        string += f', ctrl_b: {self.ctrl_b}' if self.ctrl_b is not None else ''
+        string += f', swap: {self.swap}' if self.swap is not None else ''
         return string
+
+    def update_node_type(self):
+        self.rotate_node(self.theta)
+        self.add_control_node(self.ctrl_a)
+        self.add_control_control_node(self.ctrl_a, self.ctrl_b)
+        return
+
+    def rotate_node(self, theta):
+        threshold = 0.0001
+        if (self.node_type in circuit_node_types.rotatable_nodes) \
+                                or (self.node_type in circuit_node_types.rotated_nodes):
+            self.theta = theta
+
+            if theta is not None:
+                if abs(theta - pi) > threshold:
+                    if self.node_type in circuit_node_types.rotatable_nodes:
+                        self.node_type = f'r{self.node_type}'
+                else:
+                    if self.node_type in circuit_node_types.rotated_nodes:
+                        self.node_type.replace('r','')  # remove r
+        else:
+            self.theta = None
+            #logging.warning(f'"{self.node_type}" gate cannot be rotated!')
+
+    def add_control_node(self, ctrl_a):
+        if (self.node_type in circuit_node_types.controllable_nodes) \
+                                or (self.node_type in circuit_node_types.controlled_nodes):
+            self.ctrl_a = ctrl_a
+            if ctrl_a is not None:
+                if self.node_type not in circuit_node_types.controlled_nodes:
+                    self.node_type = f'c{self.node_type}'
+        #else:
+            #self.ctrl_a = None
+            #logging.warning(f'"{self.node_type}" gate cannot be controlled!')
+
+    def add_control_control_node(self, ctrl_a, ctrl_b):
+        if (self.node_type in circuit_node_types.ccxable_nodes) \
+                                or (self.node_type in circuit_node_types.ccxed_nodes):
+            self.ctrl_a = ctrl_a
+            self.ctrl_b = ctrl_b
+            if (ctrl_a is not None) and (ctrl_b is not None):
+                if self.node_type != circuit_node_types.CCX:
+                    self.node_type = circuit_node_types.CCX
+        #else:
+            #self.ctrl_b = None
+            #logging.warning(f'"{self.node_type}" gate cannot be converted to CCX gate!')
+
+    def qasm(self):
+        """generate qasm for the node"""
+        # no qasm for null nodes: empty and control nodes
+        if self.node_type in circuit_node_types.null_nodes:
+            return ''
+
+        # for measurement
+        if self.node_type == circuit_node_types.MEASURE_Z:
+            return f'{self.node_type} q[{self.qubit_index}] -> c[{self.qubit_index}];'
+
+        # rotation angle parameters
+        rotation = ''
+        if self.theta is not None:
+            rotation += f'{self.theta}'
+            if self.phi is not None:
+                rotation += f',{self.phi}'
+                if self.lam is not None:
+                    rotation += f',{self.lam}'
+        else:
+            rotation = None
+
+        # qubit indices
+        qubits = ''
+        if self.ctrl_a is not None:
+            qubits += f'q[{self.ctrl_a}],'
+            if self.ctrl_b is not None:
+                qubits += f'q[{self.ctrl_b}],'
+        if self.swap is not None:
+            qubits += f'q[{self.swap}],'
+
+        qubits += f'q[{self.qubit_index}]'
+
+        if rotation:
+            qasm_str = f'{self.node_type}({rotation}) {qubits};'
+        else:
+            qasm_str = f'{self.node_type} {qubits};'
+
+        return qasm_str
