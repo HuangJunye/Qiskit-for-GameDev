@@ -18,7 +18,7 @@ import pygame
 from qiskit import BasicAer, execute
 from qiskit.tools.visualization import plot_state_qsphere
 
-from utils import load_image
+from .. import load_image
 
 
 class QSphere(pygame.sprite.Sprite):

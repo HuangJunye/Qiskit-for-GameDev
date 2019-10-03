@@ -18,7 +18,7 @@ import pygame
 from qiskit import BasicAer, QuantumRegister, ClassicalRegister, QuantumCircuit, execute
 from qiskit.tools.visualization import plot_histogram
 
-from utils import load_image
+from .. import load_image
 
 DEFAULT_NUM_SHOTS = 100
 
