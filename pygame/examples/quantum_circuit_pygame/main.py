@@ -120,8 +120,7 @@ def main():
     # circuit_grid_model.set_node(0, 12, node_types.X, 0, 1, 2)
 
     # print("str(circuit_grid_model): ", str(circuit_grid_model))
-    qasm_str = circuit_grid_model.create_qasm_for_circuit()
-    circuit = QuantumCircuit.from_qasm_str(qasm_str)
+    circuit = circuit_grid_model.compute_circuit()
 
     circuit_diagram = CircuitDiagram(circuit)
     unitary_grid = UnitaryGrid(circuit)
@@ -307,7 +306,7 @@ def main():
                     circuit_grid.handle_input_h()
                     circuit_grid.draw(screen)
                     pygame.display.flip()
-                elif event.key == K_BACKSLASH:
+                elif event.key == K_SPACE:
                     circuit_grid.handle_input_delete()
                     circuit_grid.draw(screen)
                     pygame.display.flip()
@@ -336,7 +335,7 @@ def main():
                     circuit_grid.handle_input_rotate(np.pi / 8)
                     circuit_grid.draw(screen)
                     pygame.display.flip()
-                elif event.key == K_SPACE:
+                elif event.key == K_TAB:
                     # Update visualizations
                     # TODO: Refactor following code into methods, etc.
                     screen.blit(background, (0, 0))

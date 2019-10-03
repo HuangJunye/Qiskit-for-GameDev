@@ -1,6 +1,8 @@
 import numpy as np
 from sympy import pi
 
+from qiskit import QuantumCircuit
+
 from . import circuit_node_types
 import logging
 
@@ -87,6 +89,11 @@ class CircuitGridModel:
             for qubit_index in range(self.qubit_count):
                 qasm_str += self.circuit_grid[qubit_index][depth_index].qasm()
         return qasm_str
+
+    def compute_circuit(self):
+        qasm_str = self.create_qasm_for_circuit()
+        circuit = QuantumCircuit.from_qasm_str(qasm_str)
+        return circuit
 
     def reset_circuit(self):
         self.circuit_grid = np.empty((self.qubit_count, self.circuit_depth), dtype=CircuitGridNode)
