@@ -81,6 +81,7 @@ class CircuitGridModel:
     def create_qasm_for_circuit(self):
         qasm_str = 'OPENQASM 2.0;include "qelib1.inc";'  # include header
         qasm_str += f'qreg q[{self.qubit_count}];'  # define quantum registers
+        qasm_str += f'creg c[{self.qubit_count}];'  # define classical registers
         # add a column of identity gates to protect simulators from an empty circuit
         qasm_str += 'id q;'
 
@@ -152,8 +153,8 @@ class CircuitGridNode:
             if ctrl_a is not None:
                 if self.node_type not in node_types.controlled_nodes:
                     self.node_type = f'c{self.node_type}'
-        else:
-            self.ctrl_a = None
+        #else:
+            #self.ctrl_a = None
             #logging.warning(f'"{self.node_type}" gate cannot be controlled!')
 
     def add_control_control_node(self, ctrl_a, ctrl_b):
@@ -164,8 +165,8 @@ class CircuitGridNode:
             if (ctrl_a is not None) and (ctrl_b is not None):
                 if self.node_type != node_types.CCX:
                     self.node_type = node_types.CCX
-        else:
-            self.ctrl_b = None
+        #else:
+            #self.ctrl_b = None
             #logging.warning(f'"{self.node_type}" gate cannot be converted to CCX gate!')
 
     def qasm(self):
