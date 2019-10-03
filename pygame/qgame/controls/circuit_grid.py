@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 import numpy as np
+from sympy import pi
 
 import pygame
 
@@ -338,7 +339,7 @@ class CircuitGridGate(pygame.sprite.Sprite):
                     self.image, self.rect = load_image('gate_images/not_gate_below_ctrl.png', -1)
                 else:
                     self.image, self.rect = load_image('gate_images/not_gate_above_ctrl.png', -1)
-            elif node.theta != 0:
+            elif node.theta != pi:
                 self.image, self.rect = load_image('gate_images/rx_gate.png', -1)
                 self.rect = self.image.get_rect()
                 pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.theta % (2 * np.pi), 6)
@@ -347,7 +348,7 @@ class CircuitGridGate(pygame.sprite.Sprite):
                 self.image, self.rect = load_image('gate_images/x_gate.png', -1)
         elif node_type == node_types.Y:
             node = self.circuit_grid_model.get_node(self.qubit_index, self.depth_index)
-            if node.theta != 0:
+            if node.theta != pi:
                 self.image, self.rect = load_image('gate_images/ry_gate.png', -1)
                 self.rect = self.image.get_rect()
                 pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.theta % (2 * np.pi), 6)
@@ -356,7 +357,7 @@ class CircuitGridGate(pygame.sprite.Sprite):
                 self.image, self.rect = load_image('gate_images/y_gate.png', -1)
         elif node_type == node_types.Z:
             node = self.circuit_grid_model.get_node(self.qubit_index, self.depth_index)
-            if node.theta != 0:
+            if node.theta != pi:
                 self.image, self.rect = load_image('gate_images/rz_gate.png', -1)
                 self.rect = self.image.get_rect()
                 pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.theta % (2 * np.pi), 6)

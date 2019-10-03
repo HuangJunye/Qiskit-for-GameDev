@@ -6,6 +6,8 @@ from qiskit import QuantumCircuit
 from . import circuit_node_types
 import logging
 
+THRESHOLD = 0.0001
+
 
 class CircuitGridModel:
     """
@@ -92,6 +94,7 @@ class CircuitGridModel:
 
     def compute_circuit(self):
         qasm_str = self.create_qasm_for_circuit()
+        print(qasm_str)
         circuit = QuantumCircuit.from_qasm_str(qasm_str)
         return circuit
 
@@ -135,21 +138,16 @@ class CircuitGridNode:
         return
 
     def rotate_node(self, theta):
-        threshold = 0.0001
         if (self.node_type in circuit_node_types.rotatable_nodes) \
                                 or (self.node_type in circuit_node_types.rotated_nodes):
             self.theta = theta
 
-            if theta is not None:
-                if abs(theta - pi) > threshold:
-                    if self.node_type in circuit_node_types.rotatable_nodes:
-                        self.node_type = f'r{self.node_type}'
-                else:
-                    if self.node_type in circuit_node_types.rotated_nodes:
-                        self.node_type.replace('r','')  # remove r
-        else:
-            self.theta = None
-            #logging.warning(f'"{self.node_type}" gate cannot be rotated!')
+            if abs(theta - pi) > THRESHOLD:
+                if self.node_type in circuit_node_types.rotatable_nodes:
+                    self.node_type = f'r{self.node_type}'
+            else:
+                if self.node_type in circuit_node_types.rotated_nodes:
+                    self.node_type.replace('r', '')  # remove r
 
     def add_control_node(self, ctrl_a):
         if (self.node_type in circuit_node_types.controllable_nodes) \
@@ -186,7 +184,7 @@ class CircuitGridNode:
 
         # rotation angle parameters
         rotation = ''
-        if self.theta is not None:
+        if abs(self.theta - pi) > THRESHOLD:
             rotation += f'{self.theta}'
             if self.phi is not None:
                 rotation += f',{self.phi}'
