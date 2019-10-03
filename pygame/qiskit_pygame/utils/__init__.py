@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from .input import Input
 from .resources import load_image
 from .resources import load_sound
 from .states import comp_basis_states

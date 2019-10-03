@@ -15,4 +15,4 @@
 # limitations under the License.
 #
 from .circuit_grid_model import CircuitGridModel
-from .circuit_node_types import *
+#from .circuit_node_types import *
