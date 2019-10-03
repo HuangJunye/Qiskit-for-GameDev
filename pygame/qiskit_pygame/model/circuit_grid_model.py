@@ -1,7 +1,7 @@
 import numpy as np
 from sympy import pi
 
-import circuit_node_types
+from . import circuit_node_types
 import logging
 
 
