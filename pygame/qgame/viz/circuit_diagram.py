@@ -16,7 +16,7 @@
 #
 import pygame
 
-from .. import load_image
+from .. import load_image, file_path
 
 
 class CircuitDiagram(pygame.sprite.Sprite):
@@ -36,7 +36,9 @@ class CircuitDiagram(pygame.sprite.Sprite):
 
         # TODO: Create a save_fig method that works cross-platform
         #       and has exception handling
-        circuit_drawing.savefig("utils/data/bell_circuit.png")
+        filename = 'bell_circuit.png'
+        full_path = file_path('images', filename)
+        circuit_drawing.savefig(full_path)
 
         self.image, self.rect = load_image('bell_circuit.png', -1)
         self.image.convert()

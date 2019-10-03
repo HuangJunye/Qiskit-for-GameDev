@@ -18,9 +18,10 @@ import pygame
 from qiskit import BasicAer, QuantumRegister, ClassicalRegister, QuantumCircuit, execute
 from qiskit.tools.visualization import plot_histogram
 
-from .. import load_image
+from .. import load_image, file_path
 
-DEFAULT_NUM_SHOTS = 100
+DEFAULT_NUM_SHOTS = 1000
+
 
 class MeasurementsHistogram(pygame.sprite.Sprite):
     """Displays a histogram with measurements"""
@@ -36,8 +37,8 @@ class MeasurementsHistogram(pygame.sprite.Sprite):
 
     def set_circuit(self, circuit, num_shots=DEFAULT_NUM_SHOTS):
         backend_sim = BasicAer.get_backend('qasm_simulator')
-        qr = QuantumRegister(circuit.width(), 'q')
-        cr = ClassicalRegister(circuit.width(), 'c')
+        qr = QuantumRegister(circuit.n_qubits, 'q')
+        cr = ClassicalRegister(circuit.n_qubits, 'c')
         meas_circ = QuantumCircuit(qr, cr)
         meas_circ.barrier(qr)
         meas_circ.measure(qr, cr)
@@ -51,7 +52,9 @@ class MeasurementsHistogram(pygame.sprite.Sprite):
         print(counts)
 
         histogram = plot_histogram(counts)
-        histogram.savefig("utils/data/bell_histogram.png")
+        filename = 'bell_histogram.png'
+        full_path = file_path('images', filename)
+        histogram.savefig(full_path)
 
-        self.image, self.rect = load_image('bell_histogram.png', -1)
+        self.image, self.rect = load_image(filename, -1)
         self.image.convert()

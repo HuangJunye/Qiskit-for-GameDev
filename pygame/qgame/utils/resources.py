@@ -26,7 +26,7 @@ data_dir = os.path.join(main_dir, '..', 'data')
 
 
 def load_image(name, colorkey=None, scale=WIDTH_UNIT/13):
-    fullname = os.path.join(data_dir, 'images', name)
+    fullname = file_path('images', name)
     try:
         image = pygame.image.load(fullname)
     except pygame.error:
@@ -46,11 +46,17 @@ def load_sound(name):
         def play(self): pass
     if not pygame.mixer or not pygame.mixer.get_init():
         return NoneSound()
-    fullname = os.path.join(data_dir, 'sound', name)
+    fullname = file_path('sounds', name)
     try:
         sound = pygame.mixer.Sound(fullname)
     except pygame.error:
         print('Cannot load sound: %s' % fullname)
         raise SystemExit(str(geterror()))
     return sound
+
+
+def file_path(folder, name):
+    full_path = os.path.join(data_dir, folder, name)
+    return full_path
+
 

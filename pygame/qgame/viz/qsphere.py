@@ -18,7 +18,7 @@ import pygame
 from qiskit import BasicAer, execute
 from qiskit.tools.visualization import plot_state_qsphere
 
-from .. import load_image
+from .. import load_image, file_path
 
 
 class QSphere(pygame.sprite.Sprite):
@@ -40,8 +40,11 @@ class QSphere(pygame.sprite.Sprite):
 
         quantum_state = result_sim.get_statevector(circuit, decimals=3)
         qsphere = plot_state_qsphere(quantum_state)
-        qsphere.savefig("utils/data/bell_qsphere.png")
 
-        self.image, self.rect = load_image('bell_qsphere.png', -1)
+        filename = 'bell_qsphere.png'
+        full_path = file_path('images', filename)
+        qsphere.savefig(full_path)
+
+        self.image, self.rect = load_image(filename, -1)
         self.rect.inflate_ip(-100, -100)
         self.image.convert()
