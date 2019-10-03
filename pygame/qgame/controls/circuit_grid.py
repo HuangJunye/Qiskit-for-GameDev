@@ -33,8 +33,8 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         self.xpos = xpos
         self.ypos = ypos
         self.circuit_grid_model = circuit_grid_model
-        self.selected_wire = 0
-        self.selected_column = 0
+        self.selected_qubit = 0
+        self.selected_depth = 0
         self.circuit_grid_background = CircuitGridBackground(circuit_grid_model)
         self.circuit_grid_cursor = CircuitGridCursor()
         self.gate_tiles = np.empty((circuit_grid_model.qubit_count, circuit_grid_model.circuit_depth),
@@ -66,14 +66,14 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                 self.gate_tiles[row_idx][col_idx].rect.centery = \
                     self.ypos + GRID_HEIGHT * (row_idx + 1.0)
 
-        self.highlight_selected_node(self.selected_wire, self.selected_column)
+        self.highlight_selected_node(self.selected_qubit, self.selected_depth)
 
     def highlight_selected_node(self, qubit_index, depth_index):
-        self.selected_wire = qubit_index
-        self.selected_column = depth_index
-        self.circuit_grid_cursor.rect.left = self.xpos + GRID_WIDTH * (self.selected_column + 1) + round(
+        self.selected_qubit = qubit_index
+        self.selected_depth = depth_index
+        self.circuit_grid_cursor.rect.left = self.xpos + GRID_WIDTH * (self.selected_depth + 1) + round(
             0.375 * WIDTH_UNIT)
-        self.circuit_grid_cursor.rect.top = self.ypos + GRID_HEIGHT * (self.selected_wire + 0.5) + round(
+        self.circuit_grid_cursor.rect.top = self.ypos + GRID_HEIGHT * (self.selected_qubit + 0.5) + round(
             0.375 * WIDTH_UNIT)
 
     def reset_cursor(self):
@@ -84,30 +84,30 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         return
 
     def move_to_adjacent_node(self, direction):
-        if direction == MOVE_LEFT and self.selected_column > 0:
-            self.selected_column -= 1
-        elif direction == MOVE_RIGHT and self.selected_column < self.circuit_grid_model.circuit_depth - 1:
-            self.selected_column += 1
-        elif direction == MOVE_UP and self.selected_wire > 0:
-            self.selected_wire -= 1
-        elif direction == MOVE_DOWN and self.selected_wire < self.circuit_grid_model.qubit_count - 1:
-            self.selected_wire += 1
+        if direction == MOVE_LEFT and self.selected_depth > 0:
+            self.selected_depth -= 1
+        elif direction == MOVE_RIGHT and self.selected_depth < self.circuit_grid_model.circuit_depth - 1:
+            self.selected_depth += 1
+        elif direction == MOVE_UP and self.selected_qubit > 0:
+            self.selected_qubit -= 1
+        elif direction == MOVE_DOWN and self.selected_qubit < self.circuit_grid_model.qubit_count - 1:
+            self.selected_qubit += 1
 
-        self.highlight_selected_node(self.selected_wire, self.selected_column)
+        self.highlight_selected_node(self.selected_qubit, self.selected_depth)
 
     def get_selected_node_gate_part(self):
-        return self.circuit_grid_model.get_node_type(self.selected_wire, self.selected_column)
+        return self.circuit_grid_model.get_node_type(self.selected_qubit, self.selected_depth)
 
     def handle_input_x(self):
         # Add X gate regardless of whether there is an existing gate
         # circuit_grid_node = CircuitGridNode(node_types.X)
-        # self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+        # self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
 
         # Allow deleting using the same key only
         selected_node_gate_part = self.get_selected_node_gate_part()
         if selected_node_gate_part == node_types.EMPTY:
             circuit_grid_node = CircuitGridNode(node_types.X)
-            self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
         elif selected_node_gate_part == node_types.X:
             self.handle_input_delete()
         self.update()
@@ -116,7 +116,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         selected_node_gate_part = self.get_selected_node_gate_part()
         if selected_node_gate_part == node_types.EMPTY:
             circuit_grid_node = CircuitGridNode(node_types.Y)
-            self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
         elif selected_node_gate_part == node_types.Y:
             self.handle_input_delete()
         self.update()
@@ -125,7 +125,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         selected_node_gate_part = self.get_selected_node_gate_part()
         if selected_node_gate_part == node_types.EMPTY:
             circuit_grid_node = CircuitGridNode(node_types.Z)
-            self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
         elif selected_node_gate_part == node_types.Z:
             self.handle_input_delete()
         self.update()
@@ -134,7 +134,7 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         selected_node_gate_part = self.get_selected_node_gate_part()
         if selected_node_gate_part == node_types.EMPTY:
             circuit_grid_node = CircuitGridNode(node_types.H)
-            self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
         elif selected_node_gate_part == node_types.H:
             self.handle_input_delete()
         self.update()
@@ -145,20 +145,20 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                 selected_node_gate_part == node_types.Y or \
                 selected_node_gate_part == node_types.Z or \
                 selected_node_gate_part == node_types.H:
-            self.delete_controls_for_gate(self.selected_wire, self.selected_column)
+            self.delete_controls_for_gate(self.selected_qubit, self.selected_depth)
 
         if selected_node_gate_part == node_types.CTRL:
             gate_qubit_index = \
-                self.circuit_grid_model.get_gate_wire_for_control_node(self.selected_wire,
-                                                                       self.selected_column)
+                self.circuit_grid_model.get_gate_qubit_for_control_node(self.selected_qubit,
+                                                                            self.selected_depth)
             if gate_qubit_index >= 0:
                 self.delete_controls_for_gate(gate_qubit_index,
-                                              self.selected_column)
+                                              self.selected_depth)
         elif selected_node_gate_part != node_types.SWAP and \
                 selected_node_gate_part != node_types.CTRL and \
                 selected_node_gate_part != node_types.TRACE:
             circuit_grid_node = CircuitGridNode(node_types.EMPTY)
-            self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
 
         self.update()
 
@@ -170,27 +170,27 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                 selected_node_gate_part == node_types.Y or \
                 selected_node_gate_part == node_types.Z or \
                 selected_node_gate_part == node_types.H:
-            circuit_grid_node = self.circuit_grid_model.get_node(self.selected_wire, self.selected_column)
-            if circuit_grid_node.ctrl_a >= 0:
+            circuit_grid_node = self.circuit_grid_model.get_node(self.selected_qubit, self.selected_depth)
+            if circuit_grid_node.ctrl_a is not None:
                 # Gate already has a control qubit so remove it
                 orig_ctrl_a = circuit_grid_node.ctrl_a
-                circuit_grid_node.ctrl_a = -1
-                self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+                circuit_grid_node.ctrl_a = None
+                self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
 
                 # Remove TRACE nodes
-                for qubit_index in range(min(self.selected_wire, orig_ctrl_a) + 1,
-                                      max(self.selected_wire, orig_ctrl_a)):
+                for qubit_index in range(min(self.selected_qubit, orig_ctrl_a) + 1,
+                                      max(self.selected_qubit, orig_ctrl_a)):
                     if self.circuit_grid_model.get_node_type(qubit_index,
-                                                                  self.selected_column) == node_types.TRACE:
-                        self.circuit_grid_model.set_node(qubit_index, self.selected_column,
+                                                                  self.selected_depth) == node_types.TRACE:
+                        self.circuit_grid_model.set_node(qubit_index, self.selected_depth,
                                                          CircuitGridNode(node_types.EMPTY))
                 self.update()
             else:
                 # Attempt to place a control qubit beginning with the wire above
-                if self.selected_wire >= 0:
-                    if self.place_ctrl_qubit(self.selected_wire, self.selected_wire - 1) == -1:
-                        if self.selected_wire < self.circuit_grid_model.qubit_count:
-                            if self.place_ctrl_qubit(self.selected_wire, self.selected_wire + 1) == -1:
+                if self.selected_qubit is not None:
+                    if self.place_ctrl_qubit(self.selected_qubit, self.selected_qubit - 1) == -1:
+                        if self.selected_qubit < self.circuit_grid_model.qubit_count:
+                            if self.place_ctrl_qubit(self.selected_qubit, self.selected_qubit + 1) == -1:
                                 print("Can't place control qubit")
                                 self.display_exceptional_condition()
 
@@ -204,42 +204,42 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                 selected_node_gate_part == node_types.Y or \
                 selected_node_gate_part == node_types.Z or \
                 selected_node_gate_part == node_types.H:
-            circuit_grid_node = self.circuit_grid_model.get_node(self.selected_wire, self.selected_column)
+            circuit_grid_node = self.circuit_grid_model.get_node(self.selected_qubit, self.selected_depth)
             if 0 <= circuit_grid_node.ctrl_a < self.circuit_grid_model.qubit_count:
                 # Gate already has a control qubit so try to move it
                 if direction == MOVE_UP:
                     candidate_qubit_index = circuit_grid_node.ctrl_a - 1
-                    if candidate_qubit_index == self.selected_wire:
+                    if candidate_qubit_index == self.selected_qubit:
                         candidate_qubit_index -= 1
                 else:
                     candidate_qubit_index = circuit_grid_node.ctrl_a + 1
-                    if candidate_qubit_index == self.selected_wire:
+                    if candidate_qubit_index == self.selected_qubit:
                         candidate_qubit_index += 1
                 if 0 <= candidate_qubit_index < self.circuit_grid_model.qubit_count:
-                    if self.place_ctrl_qubit(self.selected_wire, candidate_qubit_index) == candidate_qubit_index:
+                    if self.place_ctrl_qubit(self.selected_qubit, candidate_qubit_index) == candidate_qubit_index:
                         print("control qubit successfully placed on wire ", candidate_qubit_index)
-                        if direction == MOVE_UP and candidate_qubit_index < self.selected_wire:
+                        if direction == MOVE_UP and candidate_qubit_index < self.selected_qubit:
                             if self.circuit_grid_model.get_node_type(candidate_qubit_index + 1,
-                                                                          self.selected_column) == node_types.EMPTY:
-                                self.circuit_grid_model.set_node(candidate_qubit_index + 1, self.selected_column,
+                                                                          self.selected_depth) == node_types.EMPTY:
+                                self.circuit_grid_model.set_node(candidate_qubit_index + 1, self.selected_depth,
                                                                  CircuitGridNode(node_types.TRACE))
-                        elif direction == MOVE_DOWN and candidate_qubit_index > self.selected_wire:
+                        elif direction == MOVE_DOWN and candidate_qubit_index > self.selected_qubit:
                             if self.circuit_grid_model.get_node_type(candidate_qubit_index - 1,
-                                                                          self.selected_column) == node_types.EMPTY:
-                                self.circuit_grid_model.set_node(candidate_qubit_index - 1, self.selected_column,
+                                                                          self.selected_depth) == node_types.EMPTY:
+                                self.circuit_grid_model.set_node(candidate_qubit_index - 1, self.selected_depth,
                                                                  CircuitGridNode(node_types.TRACE))
                         self.update()
                     else:
                         print("control qubit could not be placed on wire ", candidate_qubit_index)
 
-    def handle_input_rotate(self, radians):
+    def handle_input_rotate(self, theta):
         selected_node_gate_part = self.get_selected_node_gate_part()
         if selected_node_gate_part == node_types.X or \
                 selected_node_gate_part == node_types.Y or \
                 selected_node_gate_part == node_types.Z:
-            circuit_grid_node = self.circuit_grid_model.get_node(self.selected_wire, self.selected_column)
-            circuit_grid_node.radians = (circuit_grid_node.radians + radians) % (2 * np.pi)
-            self.circuit_grid_model.set_node(self.selected_wire, self.selected_column, circuit_grid_node)
+            circuit_grid_node = self.circuit_grid_model.get_node(self.selected_qubit, self.selected_depth)
+            circuit_grid_node.theta = (circuit_grid_node.theta + theta) % (2 * np.pi)
+            self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
 
         self.update()
 
@@ -251,13 +251,13 @@ class CircuitGrid(pygame.sprite.RenderPlain):
             return -1
         candidate_wire_gate_part = \
             self.circuit_grid_model.get_node_type(candidate_ctrl_qubit_index,
-                                                       self.selected_column)
+                                                       self.selected_depth)
         if candidate_wire_gate_part == node_types.EMPTY or \
                 candidate_wire_gate_part == node_types.TRACE:
-            circuit_grid_node = self.circuit_grid_model.get_node(gate_qubit_index, self.selected_column)
+            circuit_grid_node = self.circuit_grid_model.get_node(gate_qubit_index, self.selected_depth)
             circuit_grid_node.ctrl_a = candidate_ctrl_qubit_index
-            self.circuit_grid_model.set_node(gate_qubit_index, self.selected_column, circuit_grid_node)
-            self.circuit_grid_model.set_node(candidate_ctrl_qubit_index, self.selected_column,
+            self.circuit_grid_model.set_node(gate_qubit_index, self.selected_depth, circuit_grid_node)
+            self.circuit_grid_model.set_node(candidate_ctrl_qubit_index, self.selected_depth,
                                              CircuitGridNode(node_types.EMPTY))
             self.update()
             return candidate_ctrl_qubit_index
@@ -272,18 +272,18 @@ class CircuitGrid(pygame.sprite.RenderPlain):
         # Choose the control wire (if any exist) furthest away from the gate wire
         control_a_wire_distance = 0
         control_b_wire_distance = 0
-        if control_a_qubit_index >= 0:
+        if control_a_qubit_index is not None:
             control_a_wire_distance = abs(control_a_qubit_index - gate_qubit_index)
-        if control_b_qubit_index >= 0:
+        if control_b_qubit_index is not None:
             control_b_wire_distance = abs(control_b_qubit_index - gate_qubit_index)
 
-        control_qubit_index = -1
+        control_qubit_index = None
         if control_a_wire_distance > control_b_wire_distance:
             control_qubit_index = control_a_qubit_index
         elif control_a_wire_distance < control_b_wire_distance:
             control_qubit_index = control_b_qubit_index
 
-        if control_qubit_index >= 0:
+        if control_qubit_index is not None:
             # TODO: If this is a controlled gate, remove the connecting TRACE parts between the gate and the control
             # ALSO: Refactor with similar code in this method
             for wire_idx in range(min(gate_qubit_index, control_qubit_index),
@@ -331,36 +331,36 @@ class CircuitGridGate(pygame.sprite.Sprite):
             self.image, self.rect = load_image('gate_images/h_gate.png', -1)
         elif node_type == node_types.X:
             node = self.circuit_grid_model.get_node(self.qubit_index, self.depth_index)
-            if node.ctrl_a >= 0 or node.ctrl_b >= 0:
-                # This is a control-X gate or Toffoli gate
+            if node.ctrl_a is not None or node.ctrl_b is not None:
+                # This is a control-X gate or Toffoli gatex
                 # TODO: Handle Toffoli gates more completely
                 if self.qubit_index > max(node.ctrl_a, node.ctrl_b):
                     self.image, self.rect = load_image('gate_images/not_gate_below_ctrl.png', -1)
                 else:
                     self.image, self.rect = load_image('gate_images/not_gate_above_ctrl.png', -1)
-            elif node.radians != 0:
+            elif node.theta != 0:
                 self.image, self.rect = load_image('gate_images/rx_gate.png', -1)
                 self.rect = self.image.get_rect()
-                pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.radians % (2 * np.pi), 6)
-                pygame.draw.arc(self.image, MAGENTA, self.rect, node.radians % (2 * np.pi), 2 * np.pi, 1)
+                pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.theta % (2 * np.pi), 6)
+                pygame.draw.arc(self.image, MAGENTA, self.rect, node.theta % (2 * np.pi), 2 * np.pi, 1)
             else:
                 self.image, self.rect = load_image('gate_images/x_gate.png', -1)
         elif node_type == node_types.Y:
             node = self.circuit_grid_model.get_node(self.qubit_index, self.depth_index)
-            if node.radians != 0:
+            if node.theta != 0:
                 self.image, self.rect = load_image('gate_images/ry_gate.png', -1)
                 self.rect = self.image.get_rect()
-                pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.radians % (2 * np.pi), 6)
-                pygame.draw.arc(self.image, MAGENTA, self.rect, node.radians % (2 * np.pi), 2 * np.pi, 1)
+                pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.theta % (2 * np.pi), 6)
+                pygame.draw.arc(self.image, MAGENTA, self.rect, node.theta % (2 * np.pi), 2 * np.pi, 1)
             else:
                 self.image, self.rect = load_image('gate_images/y_gate.png', -1)
         elif node_type == node_types.Z:
             node = self.circuit_grid_model.get_node(self.qubit_index, self.depth_index)
-            if node.radians != 0:
+            if node.theta != 0:
                 self.image, self.rect = load_image('gate_images/rz_gate.png', -1)
                 self.rect = self.image.get_rect()
-                pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.radians % (2 * np.pi), 6)
-                pygame.draw.arc(self.image, MAGENTA, self.rect, node.radians % (2 * np.pi), 2 * np.pi, 1)
+                pygame.draw.arc(self.image, MAGENTA, self.rect, 0, node.theta % (2 * np.pi), 6)
+                pygame.draw.arc(self.image, MAGENTA, self.rect, node.theta % (2 * np.pi), 2 * np.pi, 1)
             else:
                 self.image, self.rect = load_image('gate_images/z_gate.png', -1)
         elif node_type == node_types.S:
@@ -378,7 +378,7 @@ class CircuitGridGate(pygame.sprite.Sprite):
         elif node_type == node_types.CTRL:
             # TODO: Handle Toffoli gates correctly
             if self.qubit_index > \
-                    self.circuit_grid_model.get_gate_wire_for_control_node(self.qubit_index, self.depth_index):
+                    self.circuit_grid_model.get_gate_qubit_for_control_node(self.qubit_index, self.depth_index):
                 self.image, self.rect = load_image('gate_images/ctrl_gate_bottom_wire.png', -1)
             else:
                 self.image, self.rect = load_image('gate_images/ctrl_gate_top_wire.png', -1)

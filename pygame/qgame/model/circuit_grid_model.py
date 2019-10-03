@@ -95,10 +95,10 @@ class CircuitGridModel:
 class CircuitGridNode:
     """
     Represents a node in the circuit grid
-    A node is usually a gate.
+    A node is usually a gate.y
     """
 
-    def __init__(self, node_type, qubit_index=None, theta=None, phi=None, lam=None, \
+    def __init__(self, node_type, qubit_index=None, theta=pi, phi=None, lam=None, \
                                         ctrl_a=None, ctrl_b=None, swap=None):
         self.node_type = node_type
         self.qubit_index = qubit_index
