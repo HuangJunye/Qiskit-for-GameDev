@@ -22,6 +22,14 @@
 import pygame
 from pygame.locals import *
 
+from pygame/qiskit-pygame impor
+
+import importlib.util
+spec = importlib.util.spec_from_file_location("module.name", "pygame/qiskit-pygame")
+foo = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(foo)
+foo.MyClass()
+
 from model.circuit_grid_model import *
 from model import circuit_node_types as node_types
 from containers.vbox import VBox
