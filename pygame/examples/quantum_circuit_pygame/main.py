@@ -37,6 +37,8 @@ from qgame.utils.navigation import *
 from qgame.utils.gamepad import *
 from qgame.controls.circuit_grid import *
 
+from qiskit import QuantumCircuit
+
 WINDOW_SIZE = 1500, 1000
 
 if not pygame.font: print('Warning, fonts disabled')
@@ -118,8 +120,8 @@ def main():
     # circuit_grid_model.set_node(0, 12, node_types.X, 0, 1, 2)
 
     # print("str(circuit_grid_model): ", str(circuit_grid_model))
-    circuit = circuit_grid_model.compute_circuit()
-
+    qasm_str = circuit_grid_model.create_qasm_for_circuit()
+    circuit = QuantumCircuit.from_qasm_str(qasm_str)
 
     circuit_diagram = CircuitDiagram(circuit)
     unitary_grid = UnitaryGrid(circuit)
