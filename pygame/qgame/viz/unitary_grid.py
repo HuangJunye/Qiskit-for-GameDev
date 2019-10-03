@@ -17,9 +17,9 @@
 import pygame
 from qiskit import BasicAer, execute
 
-from utils.colors import *
-from utils.fonts import *
-from utils.states import comp_basis_states
+from ..utils.colors import *
+from ..utils.fonts import *
+from .. import comp_basis_states
 
 
 class UnitaryGrid(pygame.sprite.Sprite):
