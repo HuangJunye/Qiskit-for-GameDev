@@ -1,7 +1,7 @@
 import numpy as np
 from sympy import pi
 
-import circuit_node_types as node_types
+import circuit_node_types
 import logging
 
 
@@ -17,9 +17,7 @@ class CircuitGridModel:
         # initialize empty circuit_grid
         for depth_index in range(self.circuit_depth):
             for qubit_index in range(self.qubit_count):
-                self.set_node(qubit_index, depth_index, CircuitGridNode(node_types.EMPTY))
-
-        self.threshold = 0.0001
+                self.set_node(qubit_index, depth_index, CircuitGridNode(circuit_node_types.EMPTY))
 
     def __str__(self):
         gate_array_string = ''
@@ -36,17 +34,17 @@ class CircuitGridModel:
         self.circuit_grid[qubit_index][depth_index] = circuit_grid_node
 
         if ctrl_a is not None:
-            self.circuit_grid[ctrl_a][depth_index] = CircuitGridNode(node_types.CTRL, ctrl_a)
+            self.circuit_grid[ctrl_a][depth_index] = CircuitGridNode(circuit_node_types.CTRL, ctrl_a)
 
         if ctrl_b is not None:
-            self.circuit_grid[ctrl_b][depth_index] = CircuitGridNode(node_types.CTRL, ctrl_b)
+            self.circuit_grid[ctrl_b][depth_index] = CircuitGridNode(circuit_node_types.CTRL, ctrl_b)
 
     def get_node(self, qubit_index, depth_index):
         return self.circuit_grid[qubit_index][depth_index]
 
     def get_node_type(self, qubit_index, depth_index):
         requested_node = self.circuit_grid[qubit_index][depth_index]
-        if requested_node and requested_node.node_type != node_types.EMPTY:
+        if requested_node and requested_node.node_type != circuit_node_types.EMPTY:
             # Node is occupied so return its gate
             return requested_node.node_type
         else:
@@ -57,11 +55,11 @@ class CircuitGridModel:
                     other_node = nodes_in_column[idx]
                     if other_node:
                         if other_node.ctrl_a == qubit_index or other_node.ctrl_b == qubit_index:
-                            return node_types.CTRL
+                            return circuit_node_types.CTRL
                         elif other_node.swap == qubit_index:
-                            return node_types.SWAP
+                            return circuit_node_types.SWAP
 
-        return node_types.EMPTY
+        return circuit_node_types.EMPTY
 
     def get_gate_qubit_for_control_node(self, control_qubit_index, depth_index):
         """Get qubit index for gate that belongs to a control node on the given qubit"""
@@ -131,40 +129,40 @@ class CircuitGridNode:
 
     def rotate_node(self, theta):
         threshold = 0.0001
-        if (self.node_type in node_types.rotatable_nodes) \
-                                or (self.node_type in node_types.rotated_nodes):
+        if (self.node_type in circuit_node_types.rotatable_nodes) \
+                                or (self.node_type in circuit_node_types.rotated_nodes):
             self.theta = theta
 
             if theta is not None:
                 if abs(theta - pi) > threshold:
-                    if self.node_type in node_types.rotatable_nodes:
+                    if self.node_type in circuit_node_types.rotatable_nodes:
                         self.node_type = f'r{self.node_type}'
                 else:
-                    if self.node_type in node_types.rotated_nodes:
+                    if self.node_type in circuit_node_types.rotated_nodes:
                         self.node_type.replace('r','')  # remove r
         else:
             self.theta = None
             #logging.warning(f'"{self.node_type}" gate cannot be rotated!')
 
     def add_control_node(self, ctrl_a):
-        if (self.node_type in node_types.controllable_nodes) \
-                                or (self.node_type in node_types.controlled_nodes):
+        if (self.node_type in circuit_node_types.controllable_nodes) \
+                                or (self.node_type in circuit_node_types.controlled_nodes):
             self.ctrl_a = ctrl_a
             if ctrl_a is not None:
-                if self.node_type not in node_types.controlled_nodes:
+                if self.node_type not in circuit_node_types.controlled_nodes:
                     self.node_type = f'c{self.node_type}'
         #else:
             #self.ctrl_a = None
             #logging.warning(f'"{self.node_type}" gate cannot be controlled!')
 
     def add_control_control_node(self, ctrl_a, ctrl_b):
-        if (self.node_type in node_types.ccxable_nodes) \
-                                or (self.node_type in node_types.ccxed_nodes):
+        if (self.node_type in circuit_node_types.ccxable_nodes) \
+                                or (self.node_type in circuit_node_types.ccxed_nodes):
             self.ctrl_a = ctrl_a
             self.ctrl_b = ctrl_b
             if (ctrl_a is not None) and (ctrl_b is not None):
-                if self.node_type != node_types.CCX:
-                    self.node_type = node_types.CCX
+                if self.node_type != circuit_node_types.CCX:
+                    self.node_type = circuit_node_types.CCX
         #else:
             #self.ctrl_b = None
             #logging.warning(f'"{self.node_type}" gate cannot be converted to CCX gate!')
@@ -172,11 +170,11 @@ class CircuitGridNode:
     def qasm(self):
         """generate qasm for the node"""
         # no qasm for null nodes: empty and control nodes
-        if self.node_type in node_types.null_nodes:
+        if self.node_type in circuit_node_types.null_nodes:
             return ''
 
         # for measurement
-        if self.node_type == node_types.MEASURE_Z:
+        if self.node_type == circuit_node_types.MEASURE_Z:
             return f'{self.node_type} q[{self.qubit_index}] -> c[{self.qubit_index}];'
 
         # rotation angle parameters
