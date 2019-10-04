@@ -22,6 +22,8 @@
 import pygame
 from pygame.locals import *
 
+from sympy import pi
+
 import sys
 # replace the path with the path to Qiskit-for-GameDev folder on your computer
 sys.path.append('/Users/kirais/Documents/GitHub/Qiskit-for-GameDev/pygame/')
@@ -37,7 +39,6 @@ from qgame.utils.navigation import *
 from qgame.utils.gamepad import *
 from qgame.controls.circuit_grid import *
 
-from qiskit import QuantumCircuit
 
 WINDOW_SIZE = 1500, 1000
 
@@ -79,9 +80,9 @@ def main():
     # circuit_grid_model.set_node(2, 2, CircuitGridNode(node_types.X, 0, 0))
     # circuit_grid_model.set_node(1, 2, CircuitGridNode(node_types.TRACE))
 
-    # circuit_grid_model.set_node(0, 0, node_types.X, np.pi/8)
-    # circuit_grid_model.set_node(1, 0, node_types.Y, np.pi/6)
-    # circuit_grid_model.set_node(2, 0, node_types.Z, np.pi/4)
+    # circuit_grid_model.set_node(0, 0, node_types.X, pi/8)
+    # circuit_grid_model.set_node(1, 0, node_types.Y, pi/6)
+    # circuit_grid_model.set_node(2, 0, node_types.Z, pi/4)
     #
     # circuit_grid_model.set_node(0, 1, node_types.X)
     # circuit_grid_model.set_node(1, 1, node_types.Y)
@@ -99,7 +100,7 @@ def main():
     # circuit_grid_model.set_node(1, 4, node_types.TRACE)
     #
     # circuit_grid_model.set_node(0, 5, node_types.IDEN)
-    # circuit_grid_model.set_node(2, 5, node_types.Z, np.pi/4, 1)
+    # circuit_grid_model.set_node(2, 5, node_types.Z, pi/4, 1)
     #
     # circuit_grid_model.set_node(2, 6, node_types.X, 0, 0, 1)
     #
@@ -254,11 +255,11 @@ def main():
             elif event.type == JOYAXISMOTION:
                 # print("event: ", event)
                 if event.axis == AXIS_RIGHT_THUMB_X and joystick.get_axis(AXIS_RIGHT_THUMB_X) >= 0.95:
-                    circuit_grid.handle_input_rotate(np.pi / 8)
+                    circuit_grid.handle_input_rotate(pi / 8)
                     circuit_grid.draw(screen)
                     pygame.display.flip()
                 if event.axis == AXIS_RIGHT_THUMB_X and joystick.get_axis(AXIS_RIGHT_THUMB_X) <= -0.95:
-                    circuit_grid.handle_input_rotate(-np.pi / 8)
+                    circuit_grid.handle_input_rotate(-pi / 8)
                     circuit_grid.draw(screen)
                     pygame.display.flip()
                 if event.axis == AXIS_RIGHT_THUMB_Y and joystick.get_axis(AXIS_RIGHT_THUMB_Y) <= -0.95:
@@ -327,12 +328,12 @@ def main():
                     pygame.display.flip()
                 elif event.key == K_LEFT:
                     # Rotate a gate
-                    circuit_grid.handle_input_rotate(-np.pi/8)
+                    circuit_grid.handle_input_rotate(-pi/8)
                     circuit_grid.draw(screen)
                     pygame.display.flip()
                 elif event.key == K_RIGHT:
                     # Rotate a gate
-                    circuit_grid.handle_input_rotate(np.pi / 8)
+                    circuit_grid.handle_input_rotate(pi / 8)
                     circuit_grid.draw(screen)
                     pygame.display.flip()
                 elif event.key == K_TAB:

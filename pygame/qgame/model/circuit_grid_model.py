@@ -138,15 +138,19 @@ class CircuitGridNode:
         return
 
     def rotate_node(self, theta):
+        theta = (self.theta + theta) % (2 * pi)
+
         if (self.node_type in circuit_node_types.rotatable_nodes) \
                                 or (self.node_type in circuit_node_types.rotated_nodes):
             self.theta = theta
 
-            if abs(theta - pi) > THRESHOLD:
+            if theta != pi:
                 if self.node_type in circuit_node_types.rotatable_nodes:
+                    print('add r')
                     self.node_type = f'r{self.node_type}'
             else:
                 if self.node_type in circuit_node_types.rotated_nodes:
+                    print('remove r')
                     self.node_type.replace('r', '')  # remove r
 
     def add_control_node(self, ctrl_a):
@@ -184,7 +188,7 @@ class CircuitGridNode:
 
         # rotation angle parameters
         rotation = ''
-        if abs(self.theta - pi) > THRESHOLD:
+        if abs(self.theta - pi) > THRESHOLD * pi:
             rotation += f'{self.theta}'
             if self.phi is not None:
                 rotation += f',{self.phi}'
