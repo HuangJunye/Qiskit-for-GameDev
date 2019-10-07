@@ -234,13 +234,8 @@ class CircuitGrid(pygame.sprite.RenderPlain):
                         print("control qubit could not be placed on wire ", candidate_qubit_index)
 
     def handle_input_rotate(self, theta):
-        selected_node_gate_part = self.get_selected_node_gate_part()
-        if selected_node_gate_part == node_types.X or \
-                selected_node_gate_part == node_types.Y or \
-                selected_node_gate_part == node_types.Z:
-            circuit_grid_node = self.circuit_grid_model.get_node(self.selected_qubit, self.selected_depth)
-            circuit_grid_node.rotate_node(theta)
-            self.circuit_grid_model.set_node(self.selected_qubit, self.selected_depth, circuit_grid_node)
+        circuit_grid_node = self.circuit_grid_model.get_node(self.selected_qubit, self.selected_depth)
+        circuit_grid_node.rotate_node(theta)
 
         self.update()
 
@@ -330,7 +325,7 @@ class CircuitGridGate(pygame.sprite.Sprite):
 
         if node_type == node_types.H:
             self.image, self.rect = load_image('gate_images/h_gate.png', -1)
-        elif node_type == node_types.X:
+        elif (node_type == node_types.X) or (node_type == node_types.RX):
             node = self.circuit_grid_model.get_node(self.qubit_index, self.depth_index)
             if node.ctrl_a is not None or node.ctrl_b is not None:
                 # This is a control-X gate or Toffoli gatex

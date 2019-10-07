@@ -105,10 +105,10 @@ class CircuitGridModel:
 class CircuitGridNode:
     """
     Represents a node in the circuit grid
-    A node is usually a gate.y
+    A node is usually a gate.
     """
 
-    def __init__(self, node_type, qubit_index=None, theta=pi, phi=None, lam=None, \
+    def __init__(self, node_type, qubit_index=None, theta=pi, phi=None, lam=None,
                                         ctrl_a=None, ctrl_b=None, swap=None):
         self.node_type = node_type
         self.qubit_index = qubit_index
@@ -151,7 +151,7 @@ class CircuitGridNode:
             else:
                 if self.node_type in circuit_node_types.rotated_nodes:
                     print('remove r')
-                    self.node_type.replace('r', '')  # remove r
+                    self.node_type = self.node_type.replace('r', '')  # remove r
 
     def add_control_node(self, ctrl_a):
         if (self.node_type in circuit_node_types.controllable_nodes) \
@@ -188,7 +188,7 @@ class CircuitGridNode:
 
         # rotation angle parameters
         rotation = ''
-        if abs(self.theta - pi) > THRESHOLD * pi:
+        if self.theta != pi:
             rotation += f'{self.theta}'
             if self.phi is not None:
                 rotation += f',{self.phi}'
