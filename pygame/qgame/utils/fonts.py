@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # Copyright 2019 the original author or authors.
 #
@@ -13,5 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-"""Module for quantum vizualizations"""
-from .statevector_grid import StatevectorGrid
+import pygame
+
+pygame.font.init()
+ARIAL_30 = pygame.font.SysFont('Arial', 30)
+ARIAL_16 = pygame.font.SysFont('Arial', 16)

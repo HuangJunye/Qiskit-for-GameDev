@@ -10,3 +10,6 @@ qiskit flask server/server/__pycache__/api.cpython-37.pyc
 *.iml
 *.xml
 *.pyc
+pygame/qgame/data/images/bell_circuit.png
+pygame/qgame/data/images/bell_histogram.png
+pygame/qgame/data/images/bell_qsphere.png
