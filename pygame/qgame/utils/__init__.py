@@ -14,6 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from .resources import load_image
-from .resources import load_sound
+from .input import Input
+from .resources import load_image, load_sound, file_path
 from .states import comp_basis_states

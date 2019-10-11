@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 # Copyright 2019 the original author or authors.
 #
@@ -14,13 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import pygame
-from utils.parameters import WIDTH_UNIT
-
-pygame.font.init()
-GAMEOVER_FONT = pygame.font.Font('data/font/bit5x3.ttf', 10 * WIDTH_UNIT)
-CREDIT_FONT = pygame.font.Font('data/font/bit5x3.ttf', 2 * WIDTH_UNIT)
-REPLAY_FONT = pygame.font.Font('data/font/bit5x3.ttf', 5 * WIDTH_UNIT)
-SCORE_FONT = pygame.font.Font('data/font/bit5x3.ttf', 12 * WIDTH_UNIT)
-VECTOR_FONT = pygame.font.Font('data/font/bit5x3.ttf', 3 * WIDTH_UNIT)
-PLAYER_FONT = pygame.font.Font('data/font/bit5x3.ttf', 3 * WIDTH_UNIT)
+"""Module for quantum vizualizations"""
+from .circuit_diagram import CircuitDiagram
+from .qsphere import QSphere
+from .statevector_grid import StatevectorGrid
+from .unitary_grid import UnitaryGrid
+from .measurements_histogram import MeasurementsHistogram
