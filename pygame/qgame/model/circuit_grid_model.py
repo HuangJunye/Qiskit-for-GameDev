@@ -1,8 +1,12 @@
 import numpy as np
 from sympy import pi
 
-import circuit_node_types
+from qiskit import QuantumCircuit
+
+from . import circuit_node_types
 import logging
+
+THRESHOLD = 0.0001
 
 
 class CircuitGridModel:
@@ -88,6 +92,12 @@ class CircuitGridModel:
                 qasm_str += self.circuit_grid[qubit_index][depth_index].qasm()
         return qasm_str
 
+    def compute_circuit(self):
+        qasm_str = self.create_qasm_for_circuit()
+        print(qasm_str)
+        circuit = QuantumCircuit.from_qasm_str(qasm_str)
+        return circuit
+
     def reset_circuit(self):
         self.circuit_grid = np.empty((self.qubit_count, self.circuit_depth), dtype=CircuitGridNode)
 
@@ -98,7 +108,7 @@ class CircuitGridNode:
     A node is usually a gate.
     """
 
-    def __init__(self, node_type, qubit_index=None, theta=None, phi=None, lam=None, \
+    def __init__(self, node_type, qubit_index=None, theta=pi, phi=None, lam=None,
                                         ctrl_a=None, ctrl_b=None, swap=None):
         self.node_type = node_type
         self.qubit_index = qubit_index
@@ -128,21 +138,20 @@ class CircuitGridNode:
         return
 
     def rotate_node(self, theta):
-        threshold = 0.0001
+        theta = (self.theta + theta) % (2 * pi)
+
         if (self.node_type in circuit_node_types.rotatable_nodes) \
                                 or (self.node_type in circuit_node_types.rotated_nodes):
             self.theta = theta
 
-            if theta is not None:
-                if abs(theta - pi) > threshold:
-                    if self.node_type in circuit_node_types.rotatable_nodes:
-                        self.node_type = f'r{self.node_type}'
-                else:
-                    if self.node_type in circuit_node_types.rotated_nodes:
-                        self.node_type.replace('r','')  # remove r
-        else:
-            self.theta = None
-            #logging.warning(f'"{self.node_type}" gate cannot be rotated!')
+            if theta != pi:
+                if self.node_type in circuit_node_types.rotatable_nodes:
+                    print('add r')
+                    self.node_type = f'r{self.node_type}'
+            else:
+                if self.node_type in circuit_node_types.rotated_nodes:
+                    print('remove r')
+                    self.node_type = self.node_type.replace('r', '')  # remove r
 
     def add_control_node(self, ctrl_a):
         if (self.node_type in circuit_node_types.controllable_nodes) \
@@ -179,7 +188,7 @@ class CircuitGridNode:
 
         # rotation angle parameters
         rotation = ''
-        if self.theta is not None:
+        if self.theta != pi:
             rotation += f'{self.theta}'
             if self.phi is not None:
                 rotation += f',{self.phi}'
