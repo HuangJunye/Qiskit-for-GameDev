@@ -31,5 +31,5 @@ Tutorials on how to use the tools here will be added soon. Please check examples
 
 
 ## Other useful repo for making games with Qiskit
-Making games in [PewPew](https://pewpew.readthedocs.io/en/latest/pewpew10/overview.html) with Pygame and Qiskit: https://github.com/quantumjim/pewpew_qiskit_workshops
+Making games in [PewPew](https://pewpew.readthedocs.io/en/latest/pewpew10/overview.html) with Pygame and Qiskit: [PewPew+MicroQiskit](https://repl.it/@quantum_jim/PewPewMicroQiskit)
  
